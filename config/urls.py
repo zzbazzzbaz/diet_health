@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from apps.core.views import home
@@ -7,6 +7,8 @@ from apps.core.views import home
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
+    path('quiz/', include('apps.quiz.urls')),
+    path('game/', include('apps.game.urls')),
 ]
 
 if settings.DEBUG:

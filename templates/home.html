@@ -6,16 +6,19 @@
 <div class="min-h-screen flex flex-col items-center justify-center p-8">
     <!-- 标题 -->
     <div class="text-center mb-16">
-        <h1 class="text-6xl font-bold text-green-600 mb-4">🥗 饮食健康知识问答</h1>
+        <div class="flex items-center justify-center gap-4 mb-4">
+            <i data-lucide="salad" class="w-16 h-16 text-green-500"></i>
+            <h1 class="text-6xl font-bold text-green-600">饮食健康知识问答</h1>
+        </div>
         <p class="text-2xl text-gray-600">学习健康饮食知识，养成良好饮食习惯</p>
     </div>
     
     <!-- 模块入口 -->
     <div class="flex gap-12">
         <!-- 知识问答 -->
-        <a href="{% url 'home' %}" class="group">
+        <a href="{% url 'quiz:index' %}" class="group">
             <div class="w-80 h-96 bg-white rounded-3xl shadow-xl p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl border-4 border-transparent hover:border-green-400">
-                <div class="text-8xl mb-6">📚</div>
+                <i data-lucide="book-open" class="w-24 h-24 text-green-500 mb-6"></i>
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">知识问答</h2>
                 <p class="text-xl text-gray-500 text-center">测试你的饮食健康知识</p>
                 <div class="mt-6 px-8 py-3 bg-green-500 text-white text-xl rounded-full group-hover:bg-green-600 transition-colors">
@@ -25,9 +28,9 @@
         </a>
         
         <!-- 膳食搭配 -->
-        <a href="{% url 'home' %}" class="group">
+        <a href="{% url 'game:index' %}" class="group">
             <div class="w-80 h-96 bg-white rounded-3xl shadow-xl p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl border-4 border-transparent hover:border-orange-400">
-                <div class="text-8xl mb-6">🍽️</div>
+                <i data-lucide="utensils" class="w-24 h-24 text-orange-500 mb-6"></i>
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">膳食搭配</h2>
                 <p class="text-xl text-gray-500 text-center">学习科学搭配一日三餐</p>
                 <div class="mt-6 px-8 py-3 bg-orange-500 text-white text-xl rounded-full group-hover:bg-orange-600 transition-colors">

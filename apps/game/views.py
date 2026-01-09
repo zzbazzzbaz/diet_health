@@ -1,3 +1,151 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .models import Food, GameRecord
+from apps.core.models import SystemConfig
+from apps.core.ai_service import AIService
 
-# Create your views here.
+
+def index(request):
+    """游戏首页"""
+    request.session.pop('game_crowd', None)
+    request.session.pop('game_meal', None)
+    request.session.pop('game_foods', None)
+    return render(request, 'game/index.html')
+
+
+def select_crowd(request):
+    """选择人群"""
+    if request.method == 'POST':
+        crowd = request.POST.get('crowd')
+        if crowd in ['child', 'adult', 'elder']:
+            request.session['game_crowd'] = crowd
+            return redirect('game:meal')
+    return render(request, 'game/select_crowd.html')
+
+
+def select_meal(request):
+    """选择用餐时段"""
+    if not request.session.get('game_crowd'):
+        return redirect('game:crowd')
+    
+    if request.method == 'POST':
+        meal = request.POST.get('meal')
+        if meal in ['breakfast', 'lunch', 'dinner']:
+            request.session['game_meal'] = meal
+            return redirect('game:food')
+    
+    return render(request, 'game/select_meal.html')
+
+
+def select_food(request):
+    """食物选择页面"""
+    if not request.session.get('game_crowd') or not request.session.get('game_meal'):
+        return redirect('game:crowd')
+    
+    max_foods = int(SystemConfig.get_value('MAX_FOODS', '8'))
+    categories = Food.CATEGORY_CHOICES
+    
+    context = {
+        'categories': categories,
+        'max_foods': max_foods,
+        'crowd': request.session.get('game_crowd'),
+        'meal': request.session.get('game_meal'),
+    }
+    return render(request, 'game/select_food.html', context)
+
+
+def get_foods(request):
+    """获取食物列表 - JSON API"""
+    category = request.GET.get('category', '')
+    foods = Food.objects.filter(is_active=True)
+    
+    if category:
+        foods = foods.filter(category=category)
+    
+    data = [{
+        'id': f.id,
+        'name': f.name,
+        'category': f.category,
+        'image': f.image.url if f.image else '',
+    } for f in foods]
+    
+    return JsonResponse({'foods': data})
+
+
+@require_POST
+def evaluate(request):
+    """提交评分"""
+    import json
+    
+    crowd = request.session.get('game_crowd')
+    meal = request.session.get('game_meal')
+    
+    if not crowd or not meal:
+        return JsonResponse({'error': '请先选择人群和用餐时段'}, status=400)
+    
+    data = json.loads(request.body)
+    food_ids = data.get('foods', [])
+    
+    if not food_ids:
+        return JsonResponse({'error': '请至少选择一种食物'}, status=400)
+    
+    # 获取食物信息
+    foods = list(Food.objects.filter(id__in=food_ids).values('id', 'name', 'category'))
+    food_names = [f['name'] for f in foods]
+    
+    # 调用 AI 服务评分
+    ai_service = AIService()
+    result = ai_service.evaluate_meal(crowd, meal, food_names)
+    
+    # 存储到session供结果页使用
+    request.session['game_foods'] = food_ids
+    request.session['game_food_names'] = food_names
+    request.session['game_result'] = result
+    
+    return JsonResponse({'success': True, 'redirect': '/game/result/'})
+
+
+def result(request):
+    """显示评分结果"""
+    crowd = request.session.get('game_crowd')
+    meal = request.session.get('game_meal')
+    food_ids = request.session.get('game_foods', [])
+    food_names = request.session.get('game_food_names', [])
+    ai_result = request.session.get('game_result', {})
+    
+    if not crowd or not meal or not food_ids:
+        return redirect('game:index')
+    
+    # 保存游戏记录
+    GameRecord.objects.create(
+        crowd_type=crowd,
+        meal_type=meal,
+        selected_foods=food_ids,
+        health_score=ai_result.get('score', 0),
+        ai_evaluation=ai_result.get('summary', '')
+    )
+    
+    # 人群和餐次显示
+    crowd_display = dict(GameRecord.CROWD_CHOICES).get(crowd, '')
+    meal_display = dict(GameRecord.MEAL_CHOICES).get(meal, '')
+    
+    context = {
+        'score': ai_result.get('score', 0),
+        'summary': ai_result.get('summary', ''),
+        'suggestions': ai_result.get('suggestions', []),
+        'good_points': ai_result.get('good_points', []),
+        'bad_points': ai_result.get('bad_points', []),
+        'food_names': food_names,
+        'crowd': crowd_display,
+        'meal': meal_display,
+    }
+    
+    # 清除session
+    request.session.pop('game_crowd', None)
+    request.session.pop('game_meal', None)
+    request.session.pop('game_foods', None)
+    request.session.pop('game_food_names', None)
+    request.session.pop('game_result', None)
+    
+    return render(request, 'game/result.html', context)

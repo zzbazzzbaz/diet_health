@@ -3,10 +3,10 @@ name = "diet-health"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
     "dashscope>=1.25.6",
-    "django>=6.0.1",
+    "django>=4.2",
     "django-simpleui>=2025.6.24",
     "pillow>=12.1.0",
 ]

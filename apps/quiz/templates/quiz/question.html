@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}第{{ index|add:1 }}题 - 知识问答{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col p-8">
+    <!-- 顶部进度 -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-xl text-gray-600">第 {{ index|add:1 }} / {{ total }} 题</span>
+            <a href="{% url 'home' %}" class="text-gray-500 hover:text-gray-700 flex items-center gap-1">
+                <i data-lucide="x" class="w-5 h-5"></i>
+                退出
+            </a>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3">
+            <div class="bg-green-500 h-3 rounded-full transition-all duration-500" 
+                 style="width: {% widthratio index|add:1 total 100 %}%"></div>
+        </div>
+    </div>
+    
+    <!-- 题目内容 -->
+    <div class="flex-1 flex flex-col items-center justify-center max-w-4xl mx-auto w-full">
+        <div class="bg-white rounded-3xl shadow-xl p-10 w-full">
+            <!-- 题干 -->
+            <div class="text-3xl font-bold text-gray-800 mb-10 leading-relaxed">
+                {{ question.content }}
+            </div>
+            
+            <!-- 选项 -->
+            <div class="space-y-4" id="options">
+                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl border-3 border-gray-200 hover:border-green-400 hover:bg-green-50 transition-all duration-200 {% if answered and user_answer == 'A' %}{% if question.correct_answer == 'A' %}bg-green-100 border-green-500{% else %}bg-red-100 border-red-500{% endif %}{% elif answered and question.correct_answer == 'A' %}bg-green-100 border-green-500{% endif %}"
+                        data-answer="A" {% if answered %}disabled{% endif %}>
+                    <span class="font-bold mr-4">A.</span> {{ question.option_a }}
+                </button>
+                
+                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl border-3 border-gray-200 hover:border-green-400 hover:bg-green-50 transition-all duration-200 {% if answered and user_answer == 'B' %}{% if question.correct_answer == 'B' %}bg-green-100 border-green-500{% else %}bg-red-100 border-red-500{% endif %}{% elif answered and question.correct_answer == 'B' %}bg-green-100 border-green-500{% endif %}"
+                        data-answer="B" {% if answered %}disabled{% endif %}>
+                    <span class="font-bold mr-4">B.</span> {{ question.option_b }}
+                </button>
+                
+                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl border-3 border-gray-200 hover:border-green-400 hover:bg-green-50 transition-all duration-200 {% if answered and user_answer == 'C' %}{% if question.correct_answer == 'C' %}bg-green-100 border-green-500{% else %}bg-red-100 border-red-500{% endif %}{% elif answered and question.correct_answer == 'C' %}bg-green-100 border-green-500{% endif %}"
+                        data-answer="C" {% if answered %}disabled{% endif %}>
+                    <span class="font-bold mr-4">C.</span> {{ question.option_c }}
+                </button>
+                
+                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl border-3 border-gray-200 hover:border-green-400 hover:bg-green-50 transition-all duration-200 {% if answered and user_answer == 'D' %}{% if question.correct_answer == 'D' %}bg-green-100 border-green-500{% else %}bg-red-100 border-red-500{% endif %}{% elif answered and question.correct_answer == 'D' %}bg-green-100 border-green-500{% endif %}"
+                        data-answer="D" {% if answered %}disabled{% endif %}>
+                    <span class="font-bold mr-4">D.</span> {{ question.option_d }}
+                </button>
+            </div>
+            
+            <!-- 解析区域 -->
+            <div id="explanation" class="mt-8 p-6 bg-blue-50 rounded-2xl {% if not answered %}hidden{% endif %}">
+                <div class="flex items-center mb-3">
+                    <i id="result-icon" data-lucide="{% if answered %}{% if is_correct %}check-circle{% else %}x-circle{% endif %}{% else %}check-circle{% endif %}" class="w-8 h-8 mr-3 {% if answered %}{% if is_correct %}text-green-500{% else %}text-red-500{% endif %}{% endif %}"></i>
+                    <span id="result-text" class="text-xl font-bold {% if answered %}{% if is_correct %}text-green-600{% else %}text-red-600{% endif %}{% endif %}">
+                        {% if answered %}{% if is_correct %}回答正确！{% else %}回答错误{% endif %}{% endif %}
+                    </span>
+                </div>
+                <p class="text-xl text-gray-700">{{ question.explanation }}</p>
+            </div>
+        </div>
+        
+        <!-- 下一题按钮 -->
+        <div id="next-btn" class="mt-8 {% if not answered %}hidden{% endif %}">
+            {% if is_last %}
+            <a href="{% url 'quiz:result' %}" class="inline-flex items-center gap-2 px-12 py-5 bg-green-500 text-white text-2xl font-bold rounded-full hover:bg-green-600 transition-all">
+                查看结果
+                <i data-lucide="bar-chart-2" class="w-7 h-7"></i>
+            </a>
+            {% else %}
+            <a href="{% url 'quiz:question' index|add:1 %}" class="inline-flex items-center gap-2 px-12 py-5 bg-green-500 text-white text-2xl font-bold rounded-full hover:bg-green-600 transition-all">
+                下一题
+                <i data-lucide="arrow-right" class="w-7 h-7"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% include 'components/timeout_modal.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const questionId = {{ question.id }};
+const answered = {{ answered|yesno:"true,false" }};
+
+if (!answered) {
+    document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const answer = this.dataset.answer;
+            
+            document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+            
+            try {
+                const response = await fetch('{% url "quiz:submit" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({
+                        question_id: questionId,
+                        answer: answer
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                const correctAnswer = data.correct_answer;
+                
+                document.querySelectorAll('.option-btn').forEach(b => {
+                    const btnAnswer = b.dataset.answer;
+                    if (btnAnswer === correctAnswer) {
+                        b.classList.add('bg-green-100', 'border-green-500');
+                    } else if (btnAnswer === answer && !data.correct) {
+                        b.classList.add('bg-red-100', 'border-red-500');
+                    }
+                });
+                
+                const explanation = document.getElementById('explanation');
+                const resultIcon = document.getElementById('result-icon');
+                const resultText = document.getElementById('result-text');
+                
+                resultIcon.setAttribute('data-lucide', data.correct ? 'check-circle' : 'x-circle');
+                resultIcon.className = 'w-8 h-8 mr-3 ' + (data.correct ? 'text-green-500' : 'text-red-500');
+                resultText.textContent = data.correct ? '回答正确！' : '回答错误';
+                resultText.className = 'text-xl font-bold ' + (data.correct ? 'text-green-600' : 'text-red-600');
+                
+                explanation.classList.remove('hidden');
+                document.getElementById('next-btn').classList.remove('hidden');
+                
+                lucide.createIcons();
+                
+            } catch (error) {
+                console.error('提交失败:', error);
+                document.querySelectorAll('.option-btn').forEach(b => b.disabled = false);
+            }
+        });
+    });
+}
+</script>
+{% endblock %}
