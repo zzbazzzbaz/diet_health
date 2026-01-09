@@ -1,0 +1,9 @@
+from django.contrib import admin
+from .models import SystemConfig
+
+
+@admin.register(SystemConfig)
+class SystemConfigAdmin(admin.ModelAdmin):
+    list_display = ['key', 'value', 'description']
+    search_fields = ['key', 'description']
+    list_editable = ['value']

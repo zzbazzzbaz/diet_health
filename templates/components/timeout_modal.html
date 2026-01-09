@@ -1,0 +1,14 @@
+<!-- 超时提示弹窗 -->
+<div id="timeout-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 text-center max-w-md mx-4">
+        <div class="text-6xl mb-4">⏰</div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-4">您还在吗？</h3>
+        <p class="text-gray-600 mb-6">
+            检测到您已有一段时间没有操作，<br>
+            <span id="countdown" class="text-3xl font-bold text-orange-500">10</span> 秒后将返回首页
+        </p>
+        <button onclick="resetIdleTimer()" class="px-8 py-3 bg-green-500 text-white text-xl rounded-full hover:bg-green-600 transition-colors">
+            继续操作
+        </button>
+    </div>
+</div>
