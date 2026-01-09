@@ -3,97 +3,77 @@
 
 {% block title %}选择食物 - 膳食搭配游戏{% endblock %}
 
-{% block extra_css %}
-<style>
-.food-item {
-    cursor: grab;
-    user-select: none;
-    touch-action: none;
-}
-.food-item:active {
-    cursor: grabbing;
-}
-.food-item.dragging {
-    opacity: 0.5;
-}
-.plate-area {
-    min-height: 200px;
-    transition: all 0.3s;
-}
-.plate-area.drag-over {
-    background-color: #dcfce7;
-    border-color: #22c55e;
-}
-.selected-food {
-    animation: popIn 0.3s ease;
-}
-@keyframes popIn {
-    0% { transform: scale(0); }
-    100% { transform: scale(1); }
-}
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="min-h-screen flex flex-col p-6">
+<div class="min-h-screen flex flex-col p-6 page-enter">
     <!-- 顶部导航 -->
     <div class="flex justify-between items-center mb-4">
-        <a href="{% url 'game:meal' %}" class="text-xl text-gray-500 hover:text-gray-700 flex items-center gap-2">
+        <a href="{% url 'game:meal' %}" class="text-xl text-gray-400 hover:text-gray-600 flex items-center gap-2 transition-colors">
             <i data-lucide="arrow-left" class="w-5 h-5"></i>
             返回
         </a>
-        <div class="text-xl text-gray-600 flex items-center gap-2">
-            <i data-lucide="footprints" class="w-5 h-5"></i>
-            步骤 3/3
+        <div class="flex items-center gap-3">
+            <div class="flex gap-2">
+                <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
+                    <i data-lucide="check" class="w-5 h-5"></i>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
+                    <i data-lucide="check" class="w-5 h-5"></i>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold">3</div>
+            </div>
         </div>
     </div>
     
     <!-- 主体内容 -->
     <div class="flex-1 flex gap-6">
         <!-- 左侧：食物选择区 -->
-        <div class="flex-1 bg-white rounded-2xl shadow-lg p-6">
+        <div class="flex-1 card p-6">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <i data-lucide="apple" class="w-6 h-6 text-red-500"></i>
                 选择食物
+                <span class="text-sm font-normal text-gray-400 ml-2">拖拽或点击添加到餐盘</span>
             </h2>
             
             <!-- 分类标签 -->
             <div class="flex flex-wrap gap-2 mb-4" id="category-tabs">
-                <button class="category-tab px-4 py-2 rounded-full text-lg font-medium bg-green-500 text-white" data-category="">
+                <button class="category-tab active px-4 py-2 rounded-full text-lg font-medium" data-category="">
                     全部
                 </button>
                 {% for code, name in categories %}
-                <button class="category-tab px-4 py-2 rounded-full text-lg font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-category="{{ code }}">
+                <button class="category-tab px-4 py-2 rounded-full text-lg font-medium bg-gray-100 text-gray-600 hover:bg-gray-200" data-category="{{ code }}">
                     {{ name }}
                 </button>
                 {% endfor %}
             </div>
             
             <!-- 食物列表 -->
-            <div class="grid grid-cols-4 gap-4 max-h-96 overflow-y-auto p-2" id="food-list">
+            <div class="grid grid-cols-4 gap-4 max-h-[calc(100vh-280px)] overflow-y-auto p-2" id="food-list">
                 <!-- 动态加载 -->
             </div>
         </div>
         
         <!-- 右侧：餐盘区 -->
-        <div class="w-96 bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+        <div class="w-96 card p-6 flex flex-col">
             <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
                 <i data-lucide="chef-hat" class="w-6 h-6 text-orange-500"></i>
                 我的餐盘
             </h2>
-            <p class="text-gray-500 mb-4">已选 <span id="selected-count">0</span> / {{ max_foods }} 种食物</p>
+            <p class="text-gray-500 mb-4">
+                已选 <span id="selected-count" class="text-xl font-bold text-orange-500">0</span> / {{ max_foods }} 种食物
+            </p>
             
             <!-- 餐盘放置区 -->
-            <div class="plate-area flex-1 border-4 border-dashed border-gray-300 rounded-2xl p-4 flex flex-wrap content-start gap-3" id="plate">
+            <div class="plate-area flex-1 rounded-2xl p-4 flex flex-wrap content-start gap-3 bg-gray-50" id="plate">
                 <div class="w-full h-full flex flex-col items-center justify-center text-gray-400" id="plate-hint">
-                    <i data-lucide="hand" class="w-12 h-12 mb-2"></i>
+                    <i data-lucide="hand" class="w-16 h-16 mb-3 text-gray-300"></i>
                     <span class="text-xl">将食物拖到这里</span>
+                    <span class="text-sm mt-1">或点击食物添加</span>
                 </div>
             </div>
             
             <!-- 提交按钮 -->
-            <button id="submit-btn" class="mt-4 w-full py-4 bg-orange-500 text-white text-xl font-bold rounded-full hover:bg-orange-600 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2" disabled>
-                <i data-lucide="check" class="w-6 h-6"></i>
+            <button id="submit-btn" class="btn btn-secondary w-full mt-4 py-4 text-xl" disabled>
+                <i data-lucide="sparkles" class="w-6 h-6"></i>
                 完成搭配
             </button>
         </div>
@@ -102,6 +82,7 @@
 
 {% include 'components/timeout_modal.html' %}
 {% endblock %}
+
 
 {% block extra_js %}
 <script src="{% static 'js/drag.js' %}"></script>
@@ -120,7 +101,7 @@ async function loadFoods(category = '') {
     data.foods.forEach(food => {
         const isSelected = selectedFoods.some(f => f.id === food.id);
         const div = document.createElement('div');
-        div.className = `food-item p-3 bg-gray-50 rounded-xl text-center transition-all hover:bg-gray-100 ${isSelected ? 'opacity-50' : ''}`;
+        div.className = `food-item p-3 bg-gray-50 rounded-xl text-center ${isSelected ? 'selected' : ''}`;
         div.dataset.id = food.id;
         div.dataset.name = food.name;
         div.draggable = !isSelected;
@@ -132,6 +113,7 @@ async function loadFoods(category = '') {
         
         if (!isSelected) {
             initDraggable(div);
+            div.addEventListener('click', () => addToPlate(food.id, food.name));
         }
         
         foodList.appendChild(div);
@@ -140,14 +122,15 @@ async function loadFoods(category = '') {
     lucide.createIcons();
 }
 
+
 document.querySelectorAll('.category-tab').forEach(tab => {
     tab.addEventListener('click', function() {
         document.querySelectorAll('.category-tab').forEach(t => {
-            t.classList.remove('bg-green-500', 'text-white');
-            t.classList.add('bg-gray-200', 'text-gray-700');
+            t.classList.remove('active');
+            t.classList.add('bg-gray-100', 'text-gray-600');
         });
-        this.classList.remove('bg-gray-200', 'text-gray-700');
-        this.classList.add('bg-green-500', 'text-white');
+        this.classList.add('active');
+        this.classList.remove('bg-gray-100', 'text-gray-600');
         loadFoods(this.dataset.category);
     });
 });
@@ -189,8 +172,8 @@ function updatePlate() {
             const div = document.createElement('div');
             div.className = 'selected-food px-3 py-2 bg-green-100 rounded-lg flex items-center gap-2';
             div.innerHTML = `
-                <span class="text-sm font-medium">${food.name}</span>
-                <button class="text-red-500 hover:text-red-700" onclick="removeFromPlate(${food.id})">
+                <span class="text-sm font-medium text-green-700">${food.name}</span>
+                <button class="text-red-400 hover:text-red-600 transition-colors" onclick="removeFromPlate(${food.id})">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             `;
@@ -205,16 +188,17 @@ function updatePlate() {
     
     document.querySelectorAll('.food-item').forEach(item => {
         const isSelected = selectedFoods.some(f => f.id === parseInt(item.dataset.id));
-        item.classList.toggle('opacity-50', isSelected);
+        item.classList.toggle('selected', isSelected);
         item.draggable = !isSelected;
     });
 }
+
 
 document.getElementById('submit-btn').addEventListener('click', async function() {
     if (selectedFoods.length === 0) return;
     
     this.disabled = true;
-    this.innerHTML = '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i> 评分中...';
+    this.innerHTML = '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i> AI评分中...';
     lucide.createIcons();
     
     try {
@@ -234,7 +218,7 @@ document.getElementById('submit-btn').addEventListener('click', async function()
         if (data.error) {
             alert(data.error);
             this.disabled = false;
-            this.innerHTML = '<i data-lucide="check" class="w-6 h-6"></i> 完成搭配';
+            this.innerHTML = '<i data-lucide="sparkles" class="w-6 h-6"></i> 完成搭配';
             lucide.createIcons();
             return;
         }
@@ -243,7 +227,7 @@ document.getElementById('submit-btn').addEventListener('click', async function()
     } catch (error) {
         console.error('提交失败:', error);
         this.disabled = false;
-        this.innerHTML = '<i data-lucide="check" class="w-6 h-6"></i> 完成搭配';
+        this.innerHTML = '<i data-lucide="sparkles" class="w-6 h-6"></i> 完成搭配';
         lucide.createIcons();
     }
 });

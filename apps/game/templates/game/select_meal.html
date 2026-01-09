@@ -3,23 +3,32 @@
 {% block title %}选择用餐时段 - 膳食搭配游戏{% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex flex-col p-8">
+<div class="min-h-screen flex flex-col p-8 page-enter">
     <!-- 顶部导航 -->
     <div class="flex justify-between items-center mb-8">
-        <a href="{% url 'game:crowd' %}" class="text-xl text-gray-500 hover:text-gray-700 flex items-center gap-2">
+        <a href="{% url 'game:crowd' %}" class="text-xl text-gray-400 hover:text-gray-600 flex items-center gap-2 transition-colors">
             <i data-lucide="arrow-left" class="w-5 h-5"></i>
             返回
         </a>
-        <div class="text-xl text-gray-600 flex items-center gap-2">
-            <i data-lucide="footprints" class="w-5 h-5"></i>
-            步骤 2/3
+        <div class="flex items-center gap-3">
+            <div class="flex gap-2">
+                <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
+                    <i data-lucide="check" class="w-5 h-5"></i>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold">2</div>
+                <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center font-bold">3</div>
+            </div>
         </div>
     </div>
     
     <!-- 标题 -->
     <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-600 rounded-full text-lg font-medium mb-4">
+            <i data-lucide="clock" class="w-5 h-5"></i>
+            步骤 2/3
+        </div>
         <h1 class="text-4xl font-bold text-gray-800 mb-4">请选择用餐时段</h1>
-        <p class="text-xl text-gray-600">一日三餐各有不同的搭配要点</p>
+        <p class="text-xl text-gray-500">一日三餐各有不同的搭配要点</p>
     </div>
     
     <!-- 时段选择卡片 -->
@@ -29,10 +38,16 @@
                 {% csrf_token %}
                 <input type="hidden" name="meal" value="breakfast">
                 <button type="submit" class="group">
-                    <div class="w-72 h-80 bg-white rounded-3xl shadow-xl p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl border-4 border-transparent hover:border-yellow-400">
-                        <i data-lucide="sunrise" class="w-20 h-20 text-yellow-500 mb-6"></i>
+                    <div class="card card-hover w-72 h-80 p-8 flex flex-col items-center justify-center border-4 border-transparent group-hover:border-yellow-400">
+                        <div class="w-24 h-24 rounded-full bg-yellow-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i data-lucide="sunrise" class="w-12 h-12 text-yellow-500"></i>
+                        </div>
                         <h2 class="text-3xl font-bold text-gray-800 mb-2">早餐</h2>
                         <p class="text-lg text-gray-500">一日之计在于晨</p>
+                        <div class="mt-4 text-sm text-gray-400">
+                            <i data-lucide="clock" class="w-4 h-4 inline mr-1"></i>
+                            6:00 - 9:00
+                        </div>
                     </div>
                 </button>
             </form>
@@ -41,10 +56,16 @@
                 {% csrf_token %}
                 <input type="hidden" name="meal" value="lunch">
                 <button type="submit" class="group">
-                    <div class="w-72 h-80 bg-white rounded-3xl shadow-xl p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl border-4 border-transparent hover:border-orange-400">
-                        <i data-lucide="sun" class="w-20 h-20 text-orange-500 mb-6"></i>
+                    <div class="card card-hover w-72 h-80 p-8 flex flex-col items-center justify-center border-4 border-transparent group-hover:border-orange-400">
+                        <div class="w-24 h-24 rounded-full bg-orange-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i data-lucide="sun" class="w-12 h-12 text-orange-500"></i>
+                        </div>
                         <h2 class="text-3xl font-bold text-gray-800 mb-2">午餐</h2>
                         <p class="text-lg text-gray-500">补充能量好时机</p>
+                        <div class="mt-4 text-sm text-gray-400">
+                            <i data-lucide="clock" class="w-4 h-4 inline mr-1"></i>
+                            11:30 - 13:00
+                        </div>
                     </div>
                 </button>
             </form>
@@ -53,10 +74,16 @@
                 {% csrf_token %}
                 <input type="hidden" name="meal" value="dinner">
                 <button type="submit" class="group">
-                    <div class="w-72 h-80 bg-white rounded-3xl shadow-xl p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl border-4 border-transparent hover:border-purple-400">
-                        <i data-lucide="moon" class="w-20 h-20 text-purple-500 mb-6"></i>
+                    <div class="card card-hover w-72 h-80 p-8 flex flex-col items-center justify-center border-4 border-transparent group-hover:border-purple-400">
+                        <div class="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i data-lucide="moon" class="w-12 h-12 text-purple-500"></i>
+                        </div>
                         <h2 class="text-3xl font-bold text-gray-800 mb-2">晚餐</h2>
                         <p class="text-lg text-gray-500">清淡为宜助消化</p>
+                        <div class="mt-4 text-sm text-gray-400">
+                            <i data-lucide="clock" class="w-4 h-4 inline mr-1"></i>
+                            17:30 - 19:00
+                        </div>
                     </div>
                 </button>
             </form>

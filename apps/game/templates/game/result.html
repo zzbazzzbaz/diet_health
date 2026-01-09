@@ -3,70 +3,71 @@
 {% block title %}评分结果 - 膳食搭配游戏{% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex flex-col items-center justify-center p-8">
-    <div class="bg-white rounded-3xl shadow-xl p-12 max-w-3xl w-full">
+<div class="min-h-screen flex flex-col items-center justify-center p-8 page-enter">
+    <div class="result-card p-10 max-w-3xl w-full">
         <!-- 标题 -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ crowd }} · {{ meal }}搭配评分</h1>
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-600 rounded-full text-lg font-medium mb-4">
+                <i data-lucide="utensils" class="w-5 h-5"></i>
+                {{ crowd }} · {{ meal }}
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800">膳食搭配评分</h1>
         </div>
         
         <!-- 分数展示 -->
         <div class="text-center mb-8">
-            <div class="relative inline-block">
-                <svg class="w-48 h-48" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" stroke-width="8"/>
-                    <circle cx="50" cy="50" r="45" fill="none" 
-                            stroke="{% if score >= 80 %}#22c55e{% elif score >= 60 %}#f97316{% else %}#ef4444{% endif %}" 
-                            stroke-width="8"
-                            stroke-linecap="round"
-                            stroke-dasharray="{% widthratio score 100 283 %} 283"
-                            transform="rotate(-90 50 50)"
-                            class="transition-all duration-1000"/>
+            <div class="score-circle mb-4">
+                <svg class="w-44 h-44 mx-auto" viewBox="0 0 100 100">
+                    <circle class="circle-progress-bg" cx="50" cy="50" r="42" stroke-width="8"/>
+                    <circle class="circle-progress circle-progress-fill" cx="50" cy="50" r="42" stroke-width="8"
+                            stroke="{% if score >= 80 %}#22c55e{% elif score >= 60 %}#f97316{% else %}#ef4444{% endif %}"
+                            stroke-dasharray="{% widthratio score 100 264 %} 264"/>
                 </svg>
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <span class="text-5xl font-bold {% if score >= 80 %}text-green-600{% elif score >= 60 %}text-orange-500{% else %}text-red-500{% endif %}">
-                        {{ score }}
-                    </span>
+                <div class="score-value">
+                    <div class="score-animate">
+                        <span class="text-5xl font-bold {% if score >= 80 %}text-green-600{% elif score >= 60 %}text-orange-500{% else %}text-red-500{% endif %}">{{ score }}</span>
+                        <span class="text-xl text-gray-400">分</span>
+                    </div>
                 </div>
             </div>
-            <div class="mt-4 text-2xl flex items-center justify-center gap-2">
+            <div class="flex items-center justify-center gap-2 text-xl">
                 {% if score >= 80 %}
-                <i data-lucide="star" class="w-8 h-8 text-yellow-500"></i>
-                <span class="text-green-600">搭配优秀！</span>
+                <i data-lucide="star" class="w-6 h-6 text-yellow-500"></i>
+                <span class="text-green-600 font-medium">搭配优秀！</span>
                 {% elif score >= 60 %}
-                <i data-lucide="thumbs-up" class="w-8 h-8 text-green-500"></i>
-                <span class="text-orange-500">搭配不错</span>
+                <i data-lucide="thumbs-up" class="w-6 h-6 text-green-500"></i>
+                <span class="text-orange-500 font-medium">搭配不错</span>
                 {% else %}
-                <i data-lucide="target" class="w-8 h-8 text-orange-500"></i>
-                <span class="text-red-500">继续努力</span>
+                <i data-lucide="target" class="w-6 h-6 text-orange-500"></i>
+                <span class="text-red-500 font-medium">继续努力</span>
                 {% endif %}
             </div>
             {% if summary %}
-            <p class="mt-4 text-xl text-gray-600">{{ summary }}</p>
+            <p class="mt-3 text-lg text-gray-600">{{ summary }}</p>
             {% endif %}
         </div>
-        
+
         <!-- 已选食物 -->
         <div class="mb-6">
-            <h3 class="text-xl font-bold text-gray-700 mb-3 flex items-center gap-2">
-                <i data-lucide="shopping-basket" class="w-5 h-5"></i>
-                你选择的食物：
+            <h3 class="text-lg font-bold text-gray-700 mb-3 flex items-center gap-2">
+                <i data-lucide="shopping-basket" class="w-5 h-5 text-orange-500"></i>
+                你选择的食物
             </h3>
             <div class="flex flex-wrap gap-2">
                 {% for name in food_names %}
-                <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full">{{ name }}</span>
+                <span class="tag tag-green">{{ name }}</span>
                 {% endfor %}
             </div>
         </div>
         
         <!-- 优点 -->
         {% if good_points %}
-        <div class="mb-6 p-4 bg-green-50 rounded-2xl">
-            <h3 class="text-lg font-bold text-green-700 mb-2 flex items-center gap-2">
+        <div class="mb-5 p-5 bg-green-50 rounded-2xl">
+            <h3 class="text-lg font-bold text-green-700 mb-3 flex items-center gap-2">
                 <i data-lucide="check-circle" class="w-5 h-5"></i>
-                做得好：
+                做得好
             </h3>
-            <ul class="space-y-1">
+            <ul class="space-y-2">
                 {% for point in good_points %}
                 <li class="text-gray-700 flex items-start gap-2">
                     <i data-lucide="plus" class="w-4 h-4 text-green-500 mt-1 flex-shrink-0"></i>
@@ -79,12 +80,12 @@
         
         <!-- 不足 -->
         {% if bad_points %}
-        <div class="mb-6 p-4 bg-orange-50 rounded-2xl">
-            <h3 class="text-lg font-bold text-orange-700 mb-2 flex items-center gap-2">
+        <div class="mb-5 p-5 bg-orange-50 rounded-2xl">
+            <h3 class="text-lg font-bold text-orange-700 mb-3 flex items-center gap-2">
                 <i data-lucide="alert-circle" class="w-5 h-5"></i>
-                可以改进：
+                可以改进
             </h3>
-            <ul class="space-y-1">
+            <ul class="space-y-2">
                 {% for point in bad_points %}
                 <li class="text-gray-700 flex items-start gap-2">
                     <i data-lucide="minus" class="w-4 h-4 text-orange-500 mt-1 flex-shrink-0"></i>
@@ -94,13 +95,13 @@
             </ul>
         </div>
         {% endif %}
-        
+
         <!-- 建议 -->
         {% if suggestions %}
-        <div class="mb-8 p-4 bg-blue-50 rounded-2xl">
-            <h3 class="text-lg font-bold text-blue-700 mb-2 flex items-center gap-2">
+        <div class="mb-8 p-5 bg-blue-50 rounded-2xl">
+            <h3 class="text-lg font-bold text-blue-700 mb-3 flex items-center gap-2">
                 <i data-lucide="lightbulb" class="w-5 h-5 text-yellow-500"></i>
-                营养建议：
+                营养建议
             </h3>
             <ul class="space-y-2">
                 {% for suggestion in suggestions %}
@@ -115,11 +116,11 @@
         
         <!-- 操作按钮 -->
         <div class="flex gap-6 justify-center">
-            <a href="{% url 'game:crowd' %}" class="inline-flex items-center gap-2 px-10 py-4 bg-orange-500 text-white text-xl font-bold rounded-full hover:bg-orange-600 transition-all">
+            <a href="{% url 'game:crowd' %}" class="btn btn-secondary btn-lg">
                 <i data-lucide="refresh-cw" class="w-6 h-6"></i>
                 再来一次
             </a>
-            <a href="{% url 'home' %}" class="inline-flex items-center gap-2 px-10 py-4 bg-gray-200 text-gray-700 text-xl font-bold rounded-full hover:bg-gray-300 transition-all">
+            <a href="{% url 'home' %}" class="btn btn-ghost btn-lg border-2 border-gray-200">
                 <i data-lucide="home" class="w-6 h-6"></i>
                 返回首页
             </a>

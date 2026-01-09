@@ -110,19 +110,21 @@ def result(request):
     
     total = len(question_ids)
     correct_count = sum(1 for a in answers.values() if a.get('correct'))
+    wrong_count = total - correct_count
     score = int(correct_count / total * 100) if total > 0 else 0
     
     # 评价
     if score >= 80:
-        comment = '太棒了！你是饮食健康小达人！🌟'
+        comment = '太棒了！你是饮食健康小达人！'
     elif score >= 60:
-        comment = '不错哦！继续学习会更棒！💪'
+        comment = '不错哦！继续学习会更棒！'
     else:
-        comment = '加油！多了解健康饮食知识吧！📚'
+        comment = '加油！多了解健康饮食知识吧！'
     
     context = {
         'total': total,
         'correct_count': correct_count,
+        'wrong_count': wrong_count,
         'score': score,
         'comment': comment,
     }

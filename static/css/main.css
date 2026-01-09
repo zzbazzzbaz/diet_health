@@ -1,10 +1,14 @@
+/* ========================================
+   饮食健康知识问答系统 - 主样式表
+   ======================================== */
+
 /* 全局样式 */
 * {
     box-sizing: border-box;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -13,32 +17,22 @@ body {
 button, a, .clickable {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
 }
 
-/* 卡片悬停效果 */
-.card-hover {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+/* ========================================
+   动画效果
+   ======================================== */
 
-.card-hover:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-/* 按钮点击效果 */
-.btn-press:active {
-    transform: scale(0.95);
-}
-
-/* 页面切换动画 */
+/* 页面进入动画 */
 .page-enter {
-    animation: fadeIn 0.3s ease;
+    animation: fadeInUp 0.4s ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -46,18 +40,459 @@ button, a, .clickable {
     }
 }
 
+/* 淡入动画 */
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 缩放弹出动画 */
+.pop-in {
+    animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes popIn {
+    0% { 
+        opacity: 0;
+        transform: scale(0.8); 
+    }
+    100% { 
+        opacity: 1;
+        transform: scale(1); 
+    }
+}
+
 /* 分数滚动动画 */
 .score-animate {
-    animation: scoreUp 1s ease-out;
+    animation: scoreUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes scoreUp {
-    from {
+    0% {
         opacity: 0;
-        transform: scale(0.5);
+        transform: scale(0.5) translateY(20px);
     }
-    to {
+    100% {
         opacity: 1;
-        transform: scale(1);
+        transform: scale(1) translateY(0);
     }
+}
+
+/* 脉冲动画 */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* 摇晃动画 */
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* ========================================
+   卡片样式
+   ======================================== */
+
+.card {
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   按钮样式
+   ======================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+    border: none;
+    outline: none;
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+}
+
+.btn-ghost {
+    background: rgba(255, 255, 255, 0.8);
+    color: #374151;
+    backdrop-filter: blur(10px);
+}
+
+.btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* 大按钮 */
+.btn-lg {
+    padding: 1.25rem 3rem;
+    font-size: 1.25rem;
+}
+
+/* 超大按钮 */
+.btn-xl {
+    padding: 1.5rem 4rem;
+    font-size: 1.5rem;
+}
+
+/* ========================================
+   选项按钮样式
+   ======================================== */
+
+.option-btn {
+    position: relative;
+    overflow: hidden;
+    border: 3px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.option-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.option-btn:hover::before {
+    left: 100%;
+}
+
+.option-btn:hover {
+    border-color: #22c55e;
+    background-color: #f0fdf4;
+}
+
+.option-btn:disabled {
+    cursor: not-allowed;
+}
+
+.option-btn.correct {
+    background-color: #dcfce7 !important;
+    border-color: #22c55e !important;
+}
+
+.option-btn.wrong {
+    background-color: #fee2e2 !important;
+    border-color: #ef4444 !important;
+}
+
+/* ========================================
+   进度条样式
+   ======================================== */
+
+.progress-bar {
+    height: 0.75rem;
+    background: #e5e7eb;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+    border-radius: 9999px;
+    transition: width 0.5s ease;
+}
+
+/* ========================================
+   圆形进度条
+   ======================================== */
+
+.circle-progress {
+    transform: rotate(-90deg);
+}
+
+.circle-progress-bg {
+    fill: none;
+    stroke: #e5e7eb;
+}
+
+.circle-progress-fill {
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s ease;
+}
+
+/* ========================================
+   食物选择相关
+   ======================================== */
+
+.food-item {
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    transition: all 0.2s ease;
+}
+
+.food-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.food-item:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+}
+
+.food-item.dragging {
+    opacity: 0.5;
+    transform: scale(1.1);
+}
+
+.food-item.selected {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.plate-area {
+    min-height: 200px;
+    transition: all 0.3s ease;
+    border: 4px dashed #d1d5db;
+}
+
+.plate-area.drag-over {
+    background-color: #dcfce7;
+    border-color: #22c55e;
+    transform: scale(1.02);
+}
+
+.selected-food {
+    animation: popIn 0.3s ease;
+}
+
+/* ========================================
+   分类标签
+   ======================================== */
+
+.category-tab {
+    transition: all 0.2s ease;
+}
+
+.category-tab:hover {
+    transform: translateY(-2px);
+}
+
+.category-tab.active {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: white;
+    box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3);
+}
+
+/* ========================================
+   弹窗样式
+   ======================================== */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    max-width: 90%;
+    animation: popIn 0.3s ease;
+}
+
+/* ========================================
+   解析区域
+   ======================================== */
+
+.explanation-box {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    animation: fadeInUp 0.3s ease;
+}
+
+/* ========================================
+   结果页面
+   ======================================== */
+
+.result-card {
+    background: white;
+    border-radius: 2rem;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.1);
+    animation: popIn 0.5s ease;
+}
+
+.score-circle {
+    position: relative;
+    display: inline-block;
+}
+
+.score-value {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ========================================
+   标签样式
+   ======================================== */
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.tag-green {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.tag-orange {
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+.tag-blue {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* ========================================
+   响应式适配
+   ======================================== */
+
+@media (max-width: 768px) {
+    .btn-xl {
+        padding: 1rem 2rem;
+        font-size: 1.25rem;
+    }
+}
+
+/* 大屏适配 */
+@media (min-width: 1920px) {
+    html {
+        font-size: 18px;
+    }
+}
+
+@media (min-width: 2560px) {
+    html {
+        font-size: 20px;
+    }
+}
+
+/* ========================================
+   滚动条美化
+   ======================================== */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* ========================================
+   工具类
+   ======================================== */
+
+.text-gradient-green {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gradient-orange {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
