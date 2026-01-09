@@ -129,6 +129,41 @@
 </div>
 
 {% include 'components/timeout_modal.html' %}
+
+<!-- AI分析加载遮罩 -->
+<div id="ai-loading-overlay" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl text-center">
+        <!-- 动画容器 -->
+        <div class="relative w-32 h-32 mx-auto mb-6">
+            <!-- 外圈旋转 -->
+            <div class="absolute inset-0 border-4 border-green-200 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-transparent border-t-green-500 rounded-full animate-spin"></div>
+            <!-- 中圈反向旋转 -->
+            <div class="absolute inset-3 border-4 border-orange-200 rounded-full"></div>
+            <div class="absolute inset-3 border-4 border-transparent border-t-orange-500 rounded-full animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+            <!-- 内圈图标 -->
+            <div class="absolute inset-6 bg-gradient-to-br from-green-100 to-orange-100 rounded-full flex items-center justify-center">
+                <i data-lucide="brain" class="w-12 h-12 text-green-600 animate-pulse"></i>
+            </div>
+        </div>
+        
+        <!-- 标题 -->
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">AI 智能分析中</h3>
+        
+        <!-- 动态提示文字 -->
+        <p id="ai-loading-text" class="text-gray-500 mb-6">正在分析您的膳食搭配...</p>
+        
+        <!-- 进度点 -->
+        <div class="flex justify-center gap-2 mb-4">
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0s;"></span>
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0.2s;"></span>
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0.4s;"></span>
+        </div>
+        
+        <!-- 提示 -->
+        <p class="text-sm text-gray-400">AI 正在为您生成专业的营养建议，请稍候...</p>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -319,12 +354,48 @@ function updatePlate() {
     });
 }
 
+// AI加载动画控制
+const aiLoadingOverlay = document.getElementById('ai-loading-overlay');
+const aiLoadingText = document.getElementById('ai-loading-text');
+const loadingMessages = [
+    '正在分析您的膳食搭配...',
+    '检查营养素均衡性...',
+    '评估食物搭配合理性...',
+    '生成个性化建议...',
+    '计算健康评分...',
+    '整理分析报告...'
+];
+let loadingMsgIndex = 0;
+let loadingMsgInterval = null;
+
+function showAiLoading() {
+    aiLoadingOverlay.classList.remove('hidden');
+    lucide.createIcons();
+    loadingMsgIndex = 0;
+    aiLoadingText.textContent = loadingMessages[0];
+    loadingMsgInterval = setInterval(() => {
+        loadingMsgIndex = (loadingMsgIndex + 1) % loadingMessages.length;
+        aiLoadingText.textContent = loadingMessages[loadingMsgIndex];
+    }, 2000);
+}
+
+function hideAiLoading() {
+    aiLoadingOverlay.classList.add('hidden');
+    if (loadingMsgInterval) {
+        clearInterval(loadingMsgInterval);
+        loadingMsgInterval = null;
+    }
+}
+
 document.getElementById('submit-btn').addEventListener('click', async function() {
     if (selectedFoods.length === 0) return;
     
     this.disabled = true;
     this.innerHTML = '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i> 评分中...';
     lucide.createIcons();
+    
+    // 显示AI加载动画
+    showAiLoading();
     
     try {
         const response = await fetch('{% url "game:evaluate" %}', {
@@ -341,6 +412,7 @@ document.getElementById('submit-btn').addEventListener('click', async function()
         const data = await response.json();
         
         if (data.error) {
+            hideAiLoading();
             alert(data.error);
             this.disabled = false;
             this.innerHTML = '<i data-lucide="check" class="w-6 h-6"></i> 完成搭配';
@@ -351,6 +423,7 @@ document.getElementById('submit-btn').addEventListener('click', async function()
         window.location.href = data.redirect;
     } catch (error) {
         console.error('提交失败:', error);
+        hideAiLoading();
         this.disabled = false;
         this.innerHTML = '<i data-lucide="check" class="w-6 h-6"></i> 完成搭配';
         lucide.createIcons();
