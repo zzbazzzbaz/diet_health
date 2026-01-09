@@ -1,21 +1,27 @@
 from django.db import models
 
 
+class FoodCategory(models.Model):
+    """食物分类模型"""
+    name = models.CharField('分类名称', max_length=50)
+    code = models.CharField('分类编码', max_length=20, unique=True)
+    icon = models.CharField('图标', max_length=50, blank=True, help_text='Lucide图标名称')
+    sort_order = models.IntegerField('排序权重', default=0)
+    is_active = models.BooleanField('是否启用', default=True)
+
+    class Meta:
+        verbose_name = '食物分类'
+        verbose_name_plural = '食物分类'
+        ordering = ['-sort_order', 'id']
+
+    def __str__(self):
+        return self.name
+
+
 class Food(models.Model):
     """食物模型"""
-    CATEGORY_CHOICES = [
-        ('staple', '主食类'),
-        ('meat', '肉蛋类'),
-        ('vegetable', '蔬菜类'),
-        ('fruit', '水果类'),
-        ('dairy', '奶制品'),
-        ('bean', '豆制品'),
-        ('drink', '饮品类'),
-        ('snack', '零食甜点'),
-    ]
-
     name = models.CharField('食物名称', max_length=50)
-    category = models.CharField('食物分类', max_length=20, choices=CATEGORY_CHOICES)
+    category = models.ForeignKey(FoodCategory, on_delete=models.PROTECT, verbose_name='食物分类', related_name='foods')
     image = models.ImageField('食物图片', upload_to='foods/', blank=True)
     description = models.TextField('食物描述', blank=True)
     is_active = models.BooleanField('是否启用', default=True)
@@ -27,7 +33,7 @@ class Food(models.Model):
         ordering = ['category', '-sort_order', 'name']
 
     def __str__(self):
-        return f'{self.get_category_display()} - {self.name}'
+        return f'{self.category.name} - {self.name}'
 
 
 class GameRecord(models.Model):

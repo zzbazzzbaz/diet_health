@@ -1,6 +1,14 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Food, GameRecord
+from .models import FoodCategory, Food, GameRecord
+
+
+@admin.register(FoodCategory)
+class FoodCategoryAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'code', 'icon', 'sort_order', 'is_active']
+    list_editable = ['sort_order', 'is_active']
+    search_fields = ['name', 'code']
+    list_per_page = 20
 
 
 @admin.register(Food)
@@ -10,6 +18,7 @@ class FoodAdmin(admin.ModelAdmin):
     search_fields = ['name', 'description']
     list_editable = ['is_active', 'sort_order']
     list_per_page = 20
+    autocomplete_fields = ['category']
 
     def image_preview(self, obj):
         if obj.image:

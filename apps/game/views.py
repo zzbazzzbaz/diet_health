@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from .models import Food, GameRecord
+from .models import FoodCategory, Food, GameRecord
 from apps.core.models import SystemConfig
 from apps.core.ai_service import AIService
 
@@ -44,7 +44,7 @@ def select_food(request):
         return redirect('game:crowd')
     
     max_foods = int(SystemConfig.get_value('MAX_FOODS', '8'))
-    categories = Food.CATEGORY_CHOICES
+    categories = FoodCategory.objects.filter(is_active=True)
     
     context = {
         'categories': categories,
@@ -57,18 +57,17 @@ def select_food(request):
 
 def get_foods(request):
     """获取食物列表 - JSON API"""
-    category = request.GET.get('category', '')
-    foods = Food.objects.filter(is_active=True)
+    category_id = request.GET.get('category', '')
+    foods = Food.objects.filter(is_active=True).select_related('category')
     
-    if category:
-        foods = foods.filter(category=category)
+    if category_id:
+        foods = foods.filter(category_id=category_id)
     
-    category_map = dict(Food.CATEGORY_CHOICES)
     data = [{
         'id': f.id,
         'name': f.name,
-        'category': f.category,
-        'category_display': category_map.get(f.category, ''),
+        'category': f.category.code,
+        'category_display': f.category.name,
         'description': f.description or '',
         'image': f.image.url if f.image else '',
     } for f in foods]
@@ -94,14 +93,13 @@ def evaluate(request):
         return JsonResponse({'error': '请至少选择一种食物'}, status=400)
     
     # 获取食物完整信息
-    category_map = dict(Food.CATEGORY_CHOICES)
-    foods_qs = Food.objects.filter(id__in=food_ids)
+    foods_qs = Food.objects.filter(id__in=food_ids).select_related('category')
     
     foods_data = [{
         'id': f.id,
         'name': f.name,
-        'category': f.category,
-        'category_display': category_map.get(f.category, ''),
+        'category': f.category.code,
+        'category_display': f.category.name,
         'description': f.description,
     } for f in foods_qs]
     

@@ -62,9 +62,9 @@
                 <button class="category-tab px-3 py-1.5 rounded-full text-sm font-medium bg-green-500 text-white" data-category="">
                     全部
                 </button>
-                {% for code, name in categories %}
-                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-category="{{ code }}">
-                    {{ name }}
+                {% for cat in categories %}
+                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-category="{{ cat.id }}">
+                    {{ cat.name }}
                 </button>
                 {% endfor %}
             </div>
