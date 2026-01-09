@@ -1,16 +1,13 @@
 <!-- 超时提示弹窗 -->
-<div id="timeout-modal" class="hidden modal-overlay">
-    <div class="modal-content max-w-md mx-4 text-center">
-        <div class="w-20 h-20 mx-auto rounded-full bg-orange-100 flex items-center justify-center mb-4 pop-in">
-            <i data-lucide="clock" class="w-10 h-10 text-orange-500"></i>
-        </div>
+<div id="timeout-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 text-center max-w-md mx-4">
+        <i data-lucide="clock" class="w-16 h-16 text-orange-500 mx-auto mb-4"></i>
         <h3 class="text-2xl font-bold text-gray-800 mb-4">您还在吗？</h3>
-        <p class="text-gray-600 mb-2">检测到您已有一段时间没有操作</p>
-        <p class="mb-6">
-            <span id="countdown" class="text-4xl font-bold text-orange-500">10</span>
-            <span class="text-gray-500">秒后将返回首页</span>
+        <p class="text-gray-600 mb-6">
+            检测到您已有一段时间没有操作，<br>
+            <span id="countdown" class="text-3xl font-bold text-orange-500">10</span> 秒后将返回首页
         </p>
-        <button onclick="resetIdleTimer()" class="btn btn-primary btn-lg">
+        <button onclick="resetIdleTimer()" class="inline-flex items-center gap-2 px-8 py-3 bg-green-500 text-white text-xl rounded-full hover:bg-green-600 transition-colors">
             <i data-lucide="hand" class="w-5 h-5"></i>
             继续操作
         </button>

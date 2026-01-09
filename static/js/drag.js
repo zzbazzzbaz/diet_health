@@ -35,7 +35,8 @@ function handleDragStart(e) {
     draggedElement = e.target.closest('.food-item');
     draggedData = {
         id: draggedElement.dataset.id,
-        name: draggedElement.dataset.name
+        name: draggedElement.dataset.name,
+        image: draggedElement.dataset.image || ''
     };
     draggedElement.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
@@ -71,7 +72,7 @@ function handleDrop(e, onDrop) {
     try {
         const data = JSON.parse(e.dataTransfer.getData('text/plain'));
         if (data && data.id && data.name) {
-            onDrop(data.id, data.name);
+            onDrop(data.id, data.name, data.image);
         }
     } catch (err) {
         console.error('Drop error:', err);
@@ -83,14 +84,15 @@ function handleTouchStart(e) {
     const touch = e.touches[0];
     draggedElement = e.target.closest('.food-item');
     
-    if (!draggedElement || draggedElement.classList.contains('opacity-50')) {
+    if (!draggedElement || draggedElement.classList.contains('opacity-40')) {
         draggedElement = null;
         return;
     }
     
     draggedData = {
         id: draggedElement.dataset.id,
-        name: draggedElement.dataset.name
+        name: draggedElement.dataset.name,
+        image: draggedElement.dataset.image || ''
     };
     
     draggedElement.classList.add('dragging');
@@ -155,7 +157,7 @@ function handleTouchEnd(e) {
         touch.clientY >= plateRect.top && touch.clientY <= plateRect.bottom) {
         // 在放置区内
         if (plate._onDrop && draggedData) {
-            plate._onDrop(draggedData.id, draggedData.name);
+            plate._onDrop(draggedData.id, draggedData.name, draggedData.image);
         }
     }
     

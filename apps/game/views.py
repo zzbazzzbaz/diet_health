@@ -63,10 +63,13 @@ def get_foods(request):
     if category:
         foods = foods.filter(category=category)
     
+    category_map = dict(Food.CATEGORY_CHOICES)
     data = [{
         'id': f.id,
         'name': f.name,
         'category': f.category,
+        'category_display': category_map.get(f.category, ''),
+        'description': f.description or '',
         'image': f.image.url if f.image else '',
     } for f in foods]
     
