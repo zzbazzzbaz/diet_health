@@ -23,6 +23,8 @@ class AIService:
             logger.info('使用Mock数据评分')
             return self._fallback_evaluation(crowd_type, meal_type, foods)
         
+        logger.info(f'调用AI服务: model={self.model}, foods={foods}')
+        
         prompt = self._build_prompt(crowd_type, meal_type, foods)
         
         for attempt in range(self.max_retries):

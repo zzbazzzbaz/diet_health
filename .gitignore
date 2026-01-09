@@ -45,6 +45,10 @@ Thumbs.db
 # uv
 .uv/
 
+# logs/
+logs/*.log
+
+
 # Temporary files
 *.tmp
 *.bak
