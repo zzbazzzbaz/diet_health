@@ -90,17 +90,28 @@ def evaluate(request):
     if not food_ids:
         return JsonResponse({'error': '请至少选择一种食物'}, status=400)
     
-    # 获取食物信息
-    foods = list(Food.objects.filter(id__in=food_ids).values('id', 'name', 'category'))
-    food_names = [f['name'] for f in foods]
+    # 获取食物完整信息
+    category_map = dict(Food.CATEGORY_CHOICES)
+    foods_qs = Food.objects.filter(id__in=food_ids)
+    
+    foods_data = [{
+        'id': f.id,
+        'name': f.name,
+        'category': f.category,
+        'category_display': category_map.get(f.category, ''),
+        'description': f.description,
+    } for f in foods_qs]
+    
+    food_names = [f['name'] for f in foods_data]
     
     # 调用 AI 服务评分
     ai_service = AIService()
-    result = ai_service.evaluate_meal(crowd, meal, food_names)
+    result = ai_service.evaluate_meal(crowd, meal, foods_data)
     
     # 存储到session供结果页使用
     request.session['game_foods'] = food_ids
     request.session['game_food_names'] = food_names
+    request.session['game_foods_data'] = foods_data
     request.session['game_result'] = result
     
     return JsonResponse({'success': True, 'redirect': '/game/result/'})
@@ -112,18 +123,32 @@ def result(request):
     meal = request.session.get('game_meal')
     food_ids = request.session.get('game_foods', [])
     food_names = request.session.get('game_food_names', [])
+    foods_data = request.session.get('game_foods_data', [])
     ai_result = request.session.get('game_result', {})
     
     if not crowd or not meal or not food_ids:
         return redirect('game:index')
+    
+    # 提取 AI 元信息
+    meta = ai_result.pop('_meta', {})
     
     # 保存游戏记录
     GameRecord.objects.create(
         crowd_type=crowd,
         meal_type=meal,
         selected_foods=food_ids,
+        selected_foods_detail=foods_data,
         health_score=ai_result.get('score', 0),
-        ai_evaluation=ai_result.get('summary', '')
+        ai_summary=ai_result.get('summary', ''),
+        ai_suggestions=ai_result.get('suggestions', []),
+        ai_good_points=ai_result.get('good_points', []),
+        ai_bad_points=ai_result.get('bad_points', []),
+        ai_model=meta.get('model', ''),
+        ai_prompt=meta.get('prompt', ''),
+        ai_response=meta.get('response', ''),
+        ai_used_mock=meta.get('used_mock', False),
+        ai_duration_ms=meta.get('duration_ms', 0),
+        ai_error=meta.get('error', ''),
     )
     
     # 人群和餐次显示
@@ -146,6 +171,7 @@ def result(request):
     request.session.pop('game_meal', None)
     request.session.pop('game_foods', None)
     request.session.pop('game_food_names', None)
+    request.session.pop('game_foods_data', None)
     request.session.pop('game_result', None)
     
     return render(request, 'game/result.html', context)

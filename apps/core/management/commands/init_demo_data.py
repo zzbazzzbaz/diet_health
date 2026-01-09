@@ -135,51 +135,52 @@ class Command(BaseCommand):
     def init_foods(self):
         foods = [
             # 主食类
-            {'name': '米饭', 'category': 'staple', 'sort_order': 10},
-            {'name': '馒头', 'category': 'staple', 'sort_order': 9},
-            {'name': '面条', 'category': 'staple', 'sort_order': 8},
-            {'name': '面包', 'category': 'staple', 'sort_order': 7},
-            {'name': '玉米', 'category': 'staple', 'sort_order': 6},
+            {'name': '米饭', 'category': 'staple', 'sort_order': 10, 'description': '富含碳水化合物，提供能量'},
+            {'name': '馒头', 'category': 'staple', 'sort_order': 9, 'description': '面粉发酵制成，易消化'},
+            {'name': '面条', 'category': 'staple', 'sort_order': 8, 'description': '碳水化合物来源，饱腹感强'},
+            {'name': '面包', 'category': 'staple', 'sort_order': 7, 'description': '方便快捷的主食选择'},
+            {'name': '玉米', 'category': 'staple', 'sort_order': 6, 'description': '粗粮，富含膳食纤维'},
             # 肉蛋类
-            {'name': '鸡蛋', 'category': 'meat', 'sort_order': 10},
-            {'name': '鸡肉', 'category': 'meat', 'sort_order': 9},
-            {'name': '猪肉', 'category': 'meat', 'sort_order': 8},
-            {'name': '牛肉', 'category': 'meat', 'sort_order': 7},
-            {'name': '鱼肉', 'category': 'meat', 'sort_order': 6},
+            {'name': '鸡蛋', 'category': 'meat', 'sort_order': 10, 'description': '优质蛋白质，营养全面'},
+            {'name': '鸡肉', 'category': 'meat', 'sort_order': 9, 'description': '低脂高蛋白，易消化'},
+            {'name': '猪肉', 'category': 'meat', 'sort_order': 8, 'description': '富含蛋白质和B族维生素'},
+            {'name': '牛肉', 'category': 'meat', 'sort_order': 7, 'description': '高蛋白，富含铁和锌'},
+            {'name': '鱼肉', 'category': 'meat', 'sort_order': 6, 'description': '优质蛋白，富含DHA'},
             # 蔬菜类
-            {'name': '西红柿', 'category': 'vegetable', 'sort_order': 10},
-            {'name': '黄瓜', 'category': 'vegetable', 'sort_order': 9},
-            {'name': '白菜', 'category': 'vegetable', 'sort_order': 8},
-            {'name': '胡萝卜', 'category': 'vegetable', 'sort_order': 7},
-            {'name': '菠菜', 'category': 'vegetable', 'sort_order': 6},
+            {'name': '西红柿', 'category': 'vegetable', 'sort_order': 10, 'description': '富含维生素C和番茄红素'},
+            {'name': '黄瓜', 'category': 'vegetable', 'sort_order': 9, 'description': '低热量，补充水分'},
+            {'name': '白菜', 'category': 'vegetable', 'sort_order': 8, 'description': '富含维生素和膳食纤维'},
+            {'name': '胡萝卜', 'category': 'vegetable', 'sort_order': 7, 'description': '富含胡萝卜素，护眼'},
+            {'name': '菠菜', 'category': 'vegetable', 'sort_order': 6, 'description': '富含铁和叶酸'},
             # 水果类
-            {'name': '苹果', 'category': 'fruit', 'sort_order': 10},
-            {'name': '香蕉', 'category': 'fruit', 'sort_order': 9},
-            {'name': '橙子', 'category': 'fruit', 'sort_order': 8},
-            {'name': '葡萄', 'category': 'fruit', 'sort_order': 7},
-            {'name': '西瓜', 'category': 'fruit', 'sort_order': 6},
+            {'name': '苹果', 'category': 'fruit', 'sort_order': 10, 'description': '富含果胶和维生素'},
+            {'name': '香蕉', 'category': 'fruit', 'sort_order': 9, 'description': '富含钾，补充能量'},
+            {'name': '橙子', 'category': 'fruit', 'sort_order': 8, 'description': '维生素C含量高'},
+            {'name': '葡萄', 'category': 'fruit', 'sort_order': 7, 'description': '富含花青素，抗氧化'},
+            {'name': '西瓜', 'category': 'fruit', 'sort_order': 6, 'description': '水分多，消暑解渴'},
             # 奶制品
-            {'name': '牛奶', 'category': 'dairy', 'sort_order': 10},
-            {'name': '酸奶', 'category': 'dairy', 'sort_order': 9},
-            {'name': '奶酪', 'category': 'dairy', 'sort_order': 8},
+            {'name': '牛奶', 'category': 'dairy', 'sort_order': 10, 'description': '富含钙和优质蛋白'},
+            {'name': '酸奶', 'category': 'dairy', 'sort_order': 9, 'description': '含益生菌，助消化'},
+            {'name': '奶酪', 'category': 'dairy', 'sort_order': 8, 'description': '钙含量高，营养浓缩'},
             # 豆制品
-            {'name': '豆腐', 'category': 'bean', 'sort_order': 10},
-            {'name': '豆浆', 'category': 'bean', 'sort_order': 9},
-            {'name': '豆干', 'category': 'bean', 'sort_order': 8},
+            {'name': '豆腐', 'category': 'bean', 'sort_order': 10, 'description': '植物蛋白，低脂健康'},
+            {'name': '豆浆', 'category': 'bean', 'sort_order': 9, 'description': '植物蛋白饮品'},
+            {'name': '豆干', 'category': 'bean', 'sort_order': 8, 'description': '蛋白质含量高'},
             # 饮品类
-            {'name': '白开水', 'category': 'drink', 'sort_order': 10},
-            {'name': '绿茶', 'category': 'drink', 'sort_order': 9},
-            {'name': '果汁', 'category': 'drink', 'sort_order': 8},
+            {'name': '白开水', 'category': 'drink', 'sort_order': 10, 'description': '最健康的饮品'},
+            {'name': '绿茶', 'category': 'drink', 'sort_order': 9, 'description': '含茶多酚，抗氧化'},
+            {'name': '果汁', 'category': 'drink', 'sort_order': 8, 'description': '含维生素，但糖分较高'},
             # 零食甜点
-            {'name': '饼干', 'category': 'snack', 'sort_order': 5},
-            {'name': '蛋糕', 'category': 'snack', 'sort_order': 4},
-            {'name': '薯片', 'category': 'snack', 'sort_order': 3},
-            {'name': '糖果', 'category': 'snack', 'sort_order': 2},
+            {'name': '饼干', 'category': 'snack', 'sort_order': 5, 'description': '高糖高油，少吃为宜'},
+            {'name': '蛋糕', 'category': 'snack', 'sort_order': 4, 'description': '高糖高脂，偶尔食用'},
+            {'name': '薯片', 'category': 'snack', 'sort_order': 3, 'description': '高盐高油，不宜多吃'},
+            {'name': '糖果', 'category': 'snack', 'sort_order': 2, 'description': '高糖，影响牙齿健康'},
         ]
 
         for f_data in foods:
-            Food.objects.get_or_create(
+            obj, created = Food.objects.update_or_create(
                 name=f_data['name'],
                 defaults=f_data
             )
-        self.stdout.write(f'创建了 {len(foods)} 种食物')
+            status = '创建' if created else '更新'
+        self.stdout.write(f'处理了 {len(foods)} 种食物')

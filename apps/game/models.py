@@ -34,12 +34,29 @@ class GameRecord(models.Model):
     """游戏记录模型"""
     CROWD_CHOICES = [('child', '小孩'), ('adult', '成人'), ('elder', '老人')]
     MEAL_CHOICES = [('breakfast', '早餐'), ('lunch', '午餐'), ('dinner', '晚餐')]
-
+    
+    # 基本信息
     crowd_type = models.CharField('人群类型', max_length=10, choices=CROWD_CHOICES)
     meal_type = models.CharField('用餐时段', max_length=10, choices=MEAL_CHOICES)
-    selected_foods = models.JSONField('选择的食物', default=list)
+    selected_foods = models.JSONField('选择的食物', default=list, help_text='食物ID列表')
+    selected_foods_detail = models.JSONField('食物详情', default=list, blank=True, help_text='食物完整信息')
+    
+    # AI 评分结果
     health_score = models.IntegerField('健康评分', default=0)
-    ai_evaluation = models.TextField('AI评价内容', blank=True)
+    ai_summary = models.CharField('评价摘要', max_length=100, blank=True)
+    ai_suggestions = models.JSONField('改进建议', default=list, blank=True)
+    ai_good_points = models.JSONField('优点', default=list, blank=True)
+    ai_bad_points = models.JSONField('不足', default=list, blank=True)
+    
+    # AI 调用信息
+    ai_model = models.CharField('AI模型', max_length=50, blank=True)
+    ai_prompt = models.TextField('AI提示词', blank=True)
+    ai_response = models.TextField('AI原始响应', blank=True)
+    ai_used_mock = models.BooleanField('使用Mock', default=False, help_text='是否使用降级方案')
+    ai_duration_ms = models.IntegerField('AI耗时(ms)', default=0)
+    ai_error = models.TextField('AI错误信息', blank=True)
+    
+    # 时间戳
     created_at = models.DateTimeField('创建时间', auto_now_add=True)
 
     class Meta:
@@ -49,3 +66,10 @@ class GameRecord(models.Model):
 
     def __str__(self):
         return f'{self.get_crowd_type_display()}-{self.get_meal_type_display()} ({self.health_score}分)'
+    
+    @property
+    def food_names(self):
+        """获取食物名称列表"""
+        if self.selected_foods_detail:
+            return [f.get('name', '') for f in self.selected_foods_detail]
+        return []
