@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}膳食搭配游戏 - 饮食健康知识问答系统{% endblock %}
 
 {% block content %}
 <div class="min-h-screen flex flex-col items-center justify-center p-8">
     <div class="text-center">
-        <i data-lucide="utensils" class="w-32 h-32 text-orange-500 mx-auto mb-8"></i>
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="w-28 h-28 object-contain mx-auto mb-6">
         <h1 class="text-5xl font-bold text-orange-500 mb-6">膳食搭配游戏</h1>
         <p class="text-2xl text-gray-600 mb-12">学习如何科学搭配一日三餐</p>
         
@@ -19,6 +20,21 @@
                 <i data-lucide="arrow-left" class="w-5 h-5"></i>
                 返回首页
             </a>
+        </div>
+        
+        <!-- 所属单位 -->
+        <div class="mt-16 text-center">
+            <div class="flex items-center justify-center gap-6 text-gray-400 text-sm">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="school" class="w-4 h-4"></i>
+                    <span>江西师范大学附属东临新区实验学校</span>
+                </div>
+                <span class="text-gray-300">|</span>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="building-2" class="w-4 h-4"></i>
+                    <span>抚州市市场监督管理局</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>

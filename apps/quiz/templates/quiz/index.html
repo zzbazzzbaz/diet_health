@@ -1,13 +1,12 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}知识问答 - 饮食健康知识问答系统{% endblock %}
 
 {% block content %}
 <div class="min-h-screen flex flex-col items-center justify-center p-8 page-enter">
     <div class="text-center">
-        <div class="w-36 h-36 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-8 pulse">
-            <i data-lucide="book-open" class="w-20 h-20 text-green-500"></i>
-        </div>
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="w-28 h-28 object-contain mx-auto mb-6">
         <h1 class="text-5xl font-bold text-gradient-green mb-6">饮食健康知识问答</h1>
         <p class="text-2xl text-gray-500 mb-12">测试你对健康饮食的了解程度</p>
         
@@ -28,6 +27,21 @@
                 <i data-lucide="arrow-left" class="w-5 h-5"></i>
                 返回首页
             </a>
+        </div>
+        
+        <!-- 所属单位 -->
+        <div class="mt-16 text-center">
+            <div class="flex items-center justify-center gap-6 text-gray-400 text-sm">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="school" class="w-4 h-4"></i>
+                    <span>江西师范大学附属东临新区实验学校</span>
+                </div>
+                <span class="text-gray-300">|</span>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="building-2" class="w-4 h-4"></i>
+                    <span>抚州市市场监督管理局</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
