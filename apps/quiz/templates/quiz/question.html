@@ -19,62 +19,75 @@
         </div>
     </div>
     
-    <!-- 题目内容 -->
-    <div class="flex-1 flex flex-col items-center justify-center max-w-4xl mx-auto w-full">
-        <div class="card p-10 w-full">
-            <!-- 题干 -->
-            <div class="text-3xl font-bold text-gray-800 mb-10 leading-relaxed">
+    <!-- 主内容区域 -->
+    <div class="flex-1 flex flex-col items-center justify-center max-w-6xl mx-auto w-full">
+        <!-- 题干 - 居中显示 -->
+        <div id="question-card" class="card p-8 w-full mb-8">
+            <div class="text-3xl font-bold text-gray-800 text-center leading-relaxed">
                 {{ question.content }}
             </div>
-            
-            <!-- 选项 -->
-            <div class="space-y-4" id="options">
-                {% with options="A,B,C,D" %}
-                {% for opt in options|make_list %}
-                {% if opt == 'A' %}{% with text=question.option_a %}
-                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl {% if answered and user_answer == opt %}{% if question.correct_answer == opt %}correct{% else %}wrong{% endif %}{% elif answered and question.correct_answer == opt %}correct{% endif %}"
-                        data-answer="{{ opt }}" {% if answered %}disabled{% endif %}>
-                    <span class="font-bold mr-4 text-gray-400">{{ opt }}.</span> {{ text }}
+        </div>
+        
+        <!-- 选项区域 - 左右布局 -->
+        <div class="w-full flex gap-8" id="options-area">
+            <!-- 左侧 AB 选项 -->
+            <div class="flex-1 space-y-4">
+                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl {% if answered and user_answer == 'A' %}{% if question.correct_answer == 'A' %}correct{% else %}wrong{% endif %}{% elif answered and question.correct_answer == 'A' %}correct{% endif %}"
+                        data-answer="A" {% if answered %}disabled{% endif %}>
+                    <span class="font-bold mr-4 text-gray-400">A.</span> {{ question.option_a }}
                 </button>
-                {% endwith %}{% endif %}
-                {% if opt == 'B' %}{% with text=question.option_b %}
-                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl {% if answered and user_answer == opt %}{% if question.correct_answer == opt %}correct{% else %}wrong{% endif %}{% elif answered and question.correct_answer == opt %}correct{% endif %}"
-                        data-answer="{{ opt }}" {% if answered %}disabled{% endif %}>
-                    <span class="font-bold mr-4 text-gray-400">{{ opt }}.</span> {{ text }}
+                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl {% if answered and user_answer == 'B' %}{% if question.correct_answer == 'B' %}correct{% else %}wrong{% endif %}{% elif answered and question.correct_answer == 'B' %}correct{% endif %}"
+                        data-answer="B" {% if answered %}disabled{% endif %}>
+                    <span class="font-bold mr-4 text-gray-400">B.</span> {{ question.option_b }}
                 </button>
-                {% endwith %}{% endif %}
-                {% if opt == 'C' %}{% with text=question.option_c %}
-                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl {% if answered and user_answer == opt %}{% if question.correct_answer == opt %}correct{% else %}wrong{% endif %}{% elif answered and question.correct_answer == opt %}correct{% endif %}"
-                        data-answer="{{ opt }}" {% if answered %}disabled{% endif %}>
-                    <span class="font-bold mr-4 text-gray-400">{{ opt }}.</span> {{ text }}
-                </button>
-                {% endwith %}{% endif %}
-                {% if opt == 'D' %}{% with text=question.option_d %}
-                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl {% if answered and user_answer == opt %}{% if question.correct_answer == opt %}correct{% else %}wrong{% endif %}{% elif answered and question.correct_answer == opt %}correct{% endif %}"
-                        data-answer="{{ opt }}" {% if answered %}disabled{% endif %}>
-                    <span class="font-bold mr-4 text-gray-400">{{ opt }}.</span> {{ text }}
-                </button>
-                {% endwith %}{% endif %}
-                {% endfor %}
-                {% endwith %}
             </div>
             
-            <!-- 解析区域 -->
-            <div id="explanation" class="mt-8 explanation-box {% if not answered %}hidden{% endif %}">
+            <!-- 右侧 CD 选项 -->
+            <div class="flex-1 space-y-4">
+                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl {% if answered and user_answer == 'C' %}{% if question.correct_answer == 'C' %}correct{% else %}wrong{% endif %}{% elif answered and question.correct_answer == 'C' %}correct{% endif %}"
+                        data-answer="C" {% if answered %}disabled{% endif %}>
+                    <span class="font-bold mr-4 text-gray-400">C.</span> {{ question.option_c }}
+                </button>
+                <button class="option-btn w-full p-6 text-left text-2xl rounded-2xl {% if answered and user_answer == 'D' %}{% if question.correct_answer == 'D' %}correct{% else %}wrong{% endif %}{% elif answered and question.correct_answer == 'D' %}correct{% endif %}"
+                        data-answer="D" {% if answered %}disabled{% endif %}>
+                    <span class="font-bold mr-4 text-gray-400">D.</span> {{ question.option_d }}
+                </button>
+            </div>
+        </div>
+        
+        <!-- 答题结果提示 -->
+        <div id="result-hint" class="mt-8 {% if not answered %}hidden{% endif %}">
+            <div class="flex items-center justify-center gap-3">
+                <div id="result-icon" class="w-12 h-12 rounded-full flex items-center justify-center {% if answered %}{% if is_correct %}bg-green-100{% else %}bg-red-100{% endif %}{% endif %}">
+                    <i data-lucide="{% if answered %}{% if is_correct %}check{% else %}x{% endif %}{% else %}check{% endif %}" class="w-7 h-7 {% if answered %}{% if is_correct %}text-green-500{% else %}text-red-500{% endif %}{% endif %}"></i>
+                </div>
+                <span id="result-text" class="text-2xl font-bold {% if answered %}{% if is_correct %}text-green-600{% else %}text-red-600{% endif %}{% endif %}">
+                    {% if answered %}{% if is_correct %}回答正确！{% else %}回答错误{% endif %}{% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <!-- 查看解析按钮 -->
+        <div id="show-explanation-btn" class="mt-6 hidden">
+            <button onclick="showExplanation()" class="btn btn-secondary btn-lg">
+                <i data-lucide="book-open" class="w-6 h-6"></i>
+                查看答案解析
+            </button>
+        </div>
+        
+        <!-- 解析区域 -->
+        <div id="explanation" class="mt-8 w-full max-w-4xl hidden">
+            <div class="explanation-box">
                 <div class="flex items-center mb-3">
-                    <div id="result-icon" class="w-10 h-10 rounded-full flex items-center justify-center mr-3 {% if answered %}{% if is_correct %}bg-green-100{% else %}bg-red-100{% endif %}{% endif %}">
-                        <i data-lucide="{% if answered %}{% if is_correct %}check{% else %}x{% endif %}{% else %}check{% endif %}" class="w-6 h-6 {% if answered %}{% if is_correct %}text-green-500{% else %}text-red-500{% endif %}{% endif %}"></i>
-                    </div>
-                    <span id="result-text" class="text-xl font-bold {% if answered %}{% if is_correct %}text-green-600{% else %}text-red-600{% endif %}{% endif %}">
-                        {% if answered %}{% if is_correct %}回答正确！{% else %}回答错误{% endif %}{% endif %}
-                    </span>
+                    <i data-lucide="lightbulb" class="w-6 h-6 text-yellow-500 mr-2"></i>
+                    <span class="text-xl font-bold text-gray-700">答案解析</span>
                 </div>
                 <p class="text-xl text-gray-600 leading-relaxed">{{ question.explanation }}</p>
             </div>
         </div>
         
         <!-- 下一题按钮 -->
-        <div id="next-btn" class="mt-8 {% if not answered %}hidden{% endif %}">
+        <div id="next-btn" class="mt-8 hidden">
             {% if is_last %}
             <a href="{% url 'quiz:result' %}" class="btn btn-primary btn-lg">
                 查看结果
@@ -97,10 +110,35 @@
 <script>
 const questionId = {{ question.id }};
 const answered = {{ answered|yesno:"true,false" }};
+let hasAnswered = answered;
+let explanationShown = false;
+
+// 如果已经答过题，显示查看解析按钮
+if (answered) {
+    document.getElementById('show-explanation-btn').classList.remove('hidden');
+}
+
+function showExplanation() {
+    // 隐藏题目和选项
+    document.getElementById('question-card').classList.add('hidden');
+    document.getElementById('options-area').classList.add('hidden');
+    document.getElementById('result-hint').classList.add('hidden');
+    document.getElementById('show-explanation-btn').classList.add('hidden');
+    
+    // 显示解析和下一题按钮
+    document.getElementById('explanation').classList.remove('hidden');
+    document.getElementById('explanation').classList.add('fade-in');
+    document.getElementById('next-btn').classList.remove('hidden');
+    document.getElementById('next-btn').classList.add('pop-in');
+    explanationShown = true;
+    lucide.createIcons();
+}
 
 if (!answered) {
     document.querySelectorAll('.option-btn').forEach(btn => {
         btn.addEventListener('click', async function() {
+            if (hasAnswered) return;
+            
             const answer = this.dataset.answer;
             
             document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
@@ -122,11 +160,14 @@ if (!answered) {
                 
                 if (data.error) {
                     alert(data.error);
+                    document.querySelectorAll('.option-btn').forEach(b => b.disabled = false);
                     return;
                 }
                 
+                hasAnswered = true;
                 const correctAnswer = data.correct_answer;
                 
+                // 显示正确/错误状态
                 document.querySelectorAll('.option-btn').forEach(b => {
                     const btnAnswer = b.dataset.answer;
                     if (btnAnswer === correctAnswer) {
@@ -136,19 +177,22 @@ if (!answered) {
                     }
                 });
                 
-                const explanation = document.getElementById('explanation');
+                // 显示结果提示
+                const resultHint = document.getElementById('result-hint');
                 const resultIcon = document.getElementById('result-icon');
                 const resultText = document.getElementById('result-text');
                 
-                resultIcon.className = 'w-10 h-10 rounded-full flex items-center justify-center mr-3 ' + (data.correct ? 'bg-green-100' : 'bg-red-100');
-                resultIcon.innerHTML = `<i data-lucide="${data.correct ? 'check' : 'x'}" class="w-6 h-6 ${data.correct ? 'text-green-500' : 'text-red-500'}"></i>`;
+                resultIcon.className = 'w-12 h-12 rounded-full flex items-center justify-center ' + (data.correct ? 'bg-green-100' : 'bg-red-100');
+                resultIcon.innerHTML = `<i data-lucide="${data.correct ? 'check' : 'x'}" class="w-7 h-7 ${data.correct ? 'text-green-500' : 'text-red-500'}"></i>`;
                 resultText.textContent = data.correct ? '回答正确！' : '回答错误';
-                resultText.className = 'text-xl font-bold ' + (data.correct ? 'text-green-600' : 'text-red-600');
+                resultText.className = 'text-2xl font-bold ' + (data.correct ? 'text-green-600' : 'text-red-600');
                 
-                explanation.classList.remove('hidden');
-                explanation.classList.add('fade-in');
-                document.getElementById('next-btn').classList.remove('hidden');
-                document.getElementById('next-btn').classList.add('pop-in');
+                resultHint.classList.remove('hidden');
+                resultHint.classList.add('pop-in');
+                
+                // 显示查看解析按钮
+                document.getElementById('show-explanation-btn').classList.remove('hidden');
+                document.getElementById('show-explanation-btn').classList.add('pop-in');
                 
                 lucide.createIcons();
                 

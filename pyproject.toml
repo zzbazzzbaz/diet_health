@@ -8,5 +8,7 @@ dependencies = [
     "dashscope>=1.25.6",
     "django>=4.2",
     "django-simpleui>=2025.6.24",
+    "gunicorn>=23.0.0",
     "pillow>=12.1.0",
+    "whitenoise>=6.11.0",
 ]

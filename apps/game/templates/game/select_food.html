@@ -31,79 +31,96 @@
     0% { transform: scale(0); }
     100% { transform: scale(1); }
 }
+.character-avatar {
+    animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="h-screen flex flex-col p-4 overflow-hidden">
-    <!-- 顶部导航 -->
-    <div class="flex justify-between items-center mb-3 flex-shrink-0">
-        <a href="{% url 'game:meal' %}" class="text-lg text-gray-500 hover:text-gray-700 flex items-center gap-2">
-            <i data-lucide="arrow-left" class="w-5 h-5"></i>
-            返回
-        </a>
-        <div class="text-lg text-gray-600 flex items-center gap-2">
-            <i data-lucide="footprints" class="w-5 h-5"></i>
-            步骤 3/3
-        </div>
-    </div>
-    
-    <!-- 主体内容 -->
-    <div class="flex-1 flex gap-4 min-h-0">
-        <!-- 左侧：食物选择区 -->
-        <div class="flex-1 bg-white rounded-2xl shadow-lg p-4 flex flex-col min-h-0">
-            <h2 class="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2 flex-shrink-0">
-                <i data-lucide="apple" class="w-5 h-5 text-red-500"></i>
-                选择食物
-            </h2>
-            
-            <!-- 分类标签 -->
-            <div class="flex flex-wrap gap-2 mb-3 flex-shrink-0" id="category-tabs">
-                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-medium bg-green-500 text-white" data-category="">
-                    全部
-                </button>
-                {% for cat in categories %}
-                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-category="{{ cat.id }}">
-                    {{ cat.name }}
-                </button>
-                {% endfor %}
-            </div>
-            
-            <!-- 食物列表 - 使用flex-1占满剩余空间 -->
-            <div class="flex-1 overflow-y-auto min-h-0">
-                <div class="grid grid-cols-5 gap-3 p-1" id="food-list">
-                    <!-- 动态加载 -->
-                </div>
+    <!-- 顶部区域：Q版小人 + 餐盘 -->
+    <div class="flex gap-6 mb-4 flex-shrink-0" style="height: 600px;">
+        <!-- 左上角：Q版小人（无卡片背景） -->
+        <div class="flex items-end justify-center" style="width: 500px;">
+            <div class="character-avatar">
+                {% if crowd == 'child' %}
+                <img src="{% static 'images/xh.png' %}" alt="小孩" style="width: 450px; height: 450px;" class="object-contain drop-shadow-xl">
+                {% elif crowd == 'elder' %}
+                <img src="{% static 'images/lr.png' %}" alt="老人" style="width: 450px; height: 450px;" class="object-contain drop-shadow-xl">
+                {% else %}
+                <img src="{% static 'images/cr.png' %}" alt="成人" style="width: 450px; height: 450px;" class="object-contain drop-shadow-xl">
+                {% endif %}
             </div>
         </div>
         
-        <!-- 右侧：餐盘区 -->
-        <div class="w-80 bg-white rounded-2xl shadow-lg p-4 flex flex-col min-h-0">
-            <h2 class="text-xl font-bold text-gray-800 mb-1 flex items-center gap-2 flex-shrink-0">
-                <i data-lucide="chef-hat" class="w-5 h-5 text-orange-500"></i>
-                我的餐盘
-            </h2>
-            <p class="text-gray-500 mb-3 text-sm flex-shrink-0">已选 <span id="selected-count" class="text-orange-500 font-bold">0</span> / {{ max_foods }} 种食物</p>
-            
-            <!-- 餐盘放置区 -->
-            <div class="plate-area flex-1 border-4 border-dashed border-gray-300 rounded-2xl p-3 overflow-y-auto min-h-0" id="plate">
-                <div class="w-full h-full flex flex-col items-center justify-center text-gray-400" id="plate-hint">
-                    <i data-lucide="hand" class="w-10 h-10 mb-2"></i>
-                    <span class="text-lg">将食物拖到这里</span>
-                </div>
-                <div class="grid grid-cols-2 gap-2 hidden" id="plate-foods">
-                    <!-- 已选食物 -->
+        <!-- 右上角：餐盘区 -->
+        <div class="flex-1 bg-white rounded-2xl shadow-lg p-6 flex flex-col min-h-0">
+            <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                    <i data-lucide="chef-hat" class="w-8 h-8 text-orange-500"></i>
+                    我的餐盘
+                </h2>
+                <div class="flex items-center gap-8">
+                    <p class="text-gray-500 text-xl">已选 <span id="selected-count" class="text-orange-500 font-bold text-2xl">0</span> / {{ max_foods }} 种</p>
+                    <button id="submit-btn" class="px-10 py-4 bg-orange-500 text-white text-xl font-bold rounded-full hover:bg-orange-600 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-3" disabled>
+                        <i data-lucide="check" class="w-7 h-7"></i>
+                        完成搭配
+                    </button>
                 </div>
             </div>
             
-            <!-- 提交按钮 -->
-            <button id="submit-btn" class="mt-3 w-full py-3 bg-orange-500 text-white text-lg font-bold rounded-full hover:bg-orange-600 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0" disabled>
-                <i data-lucide="check" class="w-5 h-5"></i>
-                完成搭配
+            <!-- 餐盘放置区 -->
+            <div class="plate-area flex-1 border-4 border-dashed border-gray-300 rounded-2xl p-5 overflow-y-auto min-h-0" id="plate">
+                <div class="w-full h-full flex flex-col items-center justify-center text-gray-400" id="plate-hint">
+                    <i data-lucide="hand" class="w-20 h-20 mb-4"></i>
+                    <span class="text-3xl">将食物拖到这里</span>
+                </div>
+                <div class="grid grid-cols-5 gap-4 hidden" id="plate-foods">
+                    <!-- 已选食物 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 下方：食物选择区 -->
+    <div class="flex-1 bg-white rounded-2xl shadow-lg p-4 flex flex-col min-h-0">
+        <div class="flex justify-between items-center mb-3 flex-shrink-0">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="apple" class="w-5 h-5 text-red-500"></i>
+                选择食物
+            </h2>
+            <a href="{% url 'game:meal' %}" class="text-gray-500 hover:text-gray-700 flex items-center gap-1 text-sm">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                返回上一步
+            </a>
+        </div>
+        
+        <!-- 分类标签 -->
+        <div class="flex flex-wrap gap-2 mb-3 flex-shrink-0" id="category-tabs">
+            <button class="category-tab px-3 py-1.5 rounded-full text-sm font-medium bg-green-500 text-white" data-category="">
+                全部
             </button>
+            {% for cat in categories %}
+            <button class="category-tab px-3 py-1.5 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-category="{{ cat.id }}">
+                {{ cat.name }}
+            </button>
+            {% endfor %}
+        </div>
+        
+        <!-- 食物列表 -->
+        <div class="flex-1 overflow-y-auto min-h-0">
+            <div class="grid grid-cols-8 gap-3 p-1" id="food-list">
+                <!-- 动态加载 -->
+            </div>
         </div>
     </div>
 </div>
+
 
 <!-- 食物详情弹窗 -->
 <div id="food-detail-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -133,34 +150,22 @@
 <!-- AI分析加载遮罩 -->
 <div id="ai-loading-overlay" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
     <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl text-center">
-        <!-- 动画容器 -->
         <div class="relative w-32 h-32 mx-auto mb-6">
-            <!-- 外圈旋转 -->
             <div class="absolute inset-0 border-4 border-green-200 rounded-full"></div>
             <div class="absolute inset-0 border-4 border-transparent border-t-green-500 rounded-full animate-spin"></div>
-            <!-- 中圈反向旋转 -->
             <div class="absolute inset-3 border-4 border-orange-200 rounded-full"></div>
             <div class="absolute inset-3 border-4 border-transparent border-t-orange-500 rounded-full animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
-            <!-- 内圈图标 -->
             <div class="absolute inset-6 bg-gradient-to-br from-green-100 to-orange-100 rounded-full flex items-center justify-center">
                 <i data-lucide="brain" class="w-12 h-12 text-green-600 animate-pulse"></i>
             </div>
         </div>
-        
-        <!-- 标题 -->
         <h3 class="text-2xl font-bold text-gray-800 mb-2">AI 智能分析中</h3>
-        
-        <!-- 动态提示文字 -->
         <p id="ai-loading-text" class="text-gray-500 mb-6">正在分析您的膳食搭配...</p>
-        
-        <!-- 进度点 -->
         <div class="flex justify-center gap-2 mb-4">
             <span class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0s;"></span>
             <span class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0.2s;"></span>
             <span class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0.4s;"></span>
         </div>
-        
-        <!-- 提示 -->
         <p class="text-sm text-gray-400">AI 正在为您生成专业的营养建议，请稍候...</p>
     </div>
 </div>
@@ -171,7 +176,7 @@
 <script>
 const maxFoods = {{ max_foods }};
 let selectedFoods = [];
-let allFoodsData = {}; // 存储所有食物数据
+let allFoodsData = {};
 
 async function loadFoods(category = '') {
     const url = '{% url "game:foods_api" %}' + (category ? `?category=${category}` : '');
@@ -182,7 +187,6 @@ async function loadFoods(category = '') {
     foodList.innerHTML = '';
     
     data.foods.forEach(food => {
-        // 存储食物数据
         allFoodsData[food.id] = food;
         
         const isSelected = selectedFoods.some(f => f.id === food.id);
@@ -200,9 +204,7 @@ async function loadFoods(category = '') {
         
         if (!isSelected) {
             initDraggable(div);
-            // 点击显示详情
             div.addEventListener('click', (e) => {
-                // 如果是拖拽结束后的点击，忽略
                 if (div.classList.contains('dragging')) return;
                 showFoodDetail(food.id);
             });
@@ -214,7 +216,6 @@ async function loadFoods(category = '') {
     lucide.createIcons();
 }
 
-// 显示食物详情弹窗
 function showFoodDetail(foodId) {
     const food = allFoodsData[foodId];
     if (!food) return;
@@ -226,7 +227,6 @@ function showFoodDetail(foodId) {
     const descEl = document.getElementById('modal-description');
     const addBtn = document.getElementById('modal-add');
     
-    // 设置内容
     if (food.image) {
         imageEl.innerHTML = `<img src="${food.image}" class="w-full h-full object-cover">`;
     } else {
@@ -236,7 +236,6 @@ function showFoodDetail(foodId) {
     categoryEl.textContent = food.category_display;
     descEl.textContent = food.description || '暂无描述';
     
-    // 检查是否已选
     const isSelected = selectedFoods.some(f => f.id === food.id);
     if (isSelected) {
         addBtn.disabled = true;
@@ -248,19 +247,15 @@ function showFoodDetail(foodId) {
         addBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> 添加到餐盘';
     }
     
-    // 存储当前食物ID
     addBtn.dataset.foodId = foodId;
-    
     modal.classList.remove('hidden');
     lucide.createIcons();
 }
 
-// 关闭详情弹窗
 function closeFoodDetail() {
     document.getElementById('food-detail-modal').classList.add('hidden');
 }
 
-// 弹窗事件绑定
 document.getElementById('modal-close').addEventListener('click', closeFoodDetail);
 document.getElementById('food-detail-modal').addEventListener('click', (e) => {
     if (e.target.id === 'food-detail-modal') closeFoodDetail();
@@ -295,7 +290,6 @@ function addToPlate(id, name, image) {
         return false;
     }
     
-    // 从食物列表获取图片
     if (!image) {
         const foodItem = document.querySelector(`.food-item[data-id="${id}"]`);
         image = foodItem ? foodItem.dataset.image : '';
@@ -312,7 +306,6 @@ function removeFromPlate(id) {
 }
 
 function updatePlate() {
-    const plate = document.getElementById('plate');
     const hint = document.getElementById('plate-hint');
     const plateFoods = document.getElementById('plate-foods');
     const countEl = document.getElementById('selected-count');
@@ -329,13 +322,13 @@ function updatePlate() {
         
         selectedFoods.forEach(food => {
             const div = document.createElement('div');
-            div.className = 'selected-food bg-green-50 rounded-xl p-2 text-center relative group';
+            div.className = 'selected-food bg-green-50 rounded-xl p-4 text-center relative group';
             div.innerHTML = `
-                <button class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center" onclick="removeFromPlate(${food.id})">
-                    <i data-lucide="x" class="w-3 h-3"></i>
+                <button class="absolute -top-2 -right-2 w-7 h-7 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center" onclick="removeFromPlate(${food.id})">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
-                <div class="mb-1">${food.image ? `<img src="${food.image}" class="w-12 h-12 mx-auto object-cover rounded-lg">` : '<i data-lucide="utensils" class="w-10 h-10 mx-auto text-gray-400"></i>'}</div>
-                <div class="text-xs font-medium text-gray-700 truncate">${food.name}</div>
+                <div class="mb-2">${food.image ? `<img src="${food.image}" class="w-20 h-20 mx-auto object-cover rounded-lg">` : '<i data-lucide="utensils" class="w-16 h-16 mx-auto text-gray-400"></i>'}</div>
+                <div class="text-base font-medium text-gray-700 truncate">${food.name}</div>
             `;
             plateFoods.appendChild(div);
         });
@@ -354,7 +347,6 @@ function updatePlate() {
     });
 }
 
-// AI加载动画控制
 const aiLoadingOverlay = document.getElementById('ai-loading-overlay');
 const aiLoadingText = document.getElementById('ai-loading-text');
 const loadingMessages = [
@@ -391,10 +383,9 @@ document.getElementById('submit-btn').addEventListener('click', async function()
     if (selectedFoods.length === 0) return;
     
     this.disabled = true;
-    this.innerHTML = '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i> 评分中...';
+    this.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> 评分中...';
     lucide.createIcons();
     
-    // 显示AI加载动画
     showAiLoading();
     
     try {
@@ -415,7 +406,7 @@ document.getElementById('submit-btn').addEventListener('click', async function()
             hideAiLoading();
             alert(data.error);
             this.disabled = false;
-            this.innerHTML = '<i data-lucide="check" class="w-6 h-6"></i> 完成搭配';
+            this.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> 完成搭配';
             lucide.createIcons();
             return;
         }
@@ -425,7 +416,7 @@ document.getElementById('submit-btn').addEventListener('click', async function()
         console.error('提交失败:', error);
         hideAiLoading();
         this.disabled = false;
-        this.innerHTML = '<i data-lucide="check" class="w-6 h-6"></i> 完成搭配';
+        this.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> 完成搭配';
         lucide.createIcons();
     }
 });
