@@ -17,12 +17,15 @@
     opacity: 0.5;
 }
 .plate-area {
-    min-height: 200px;
     transition: all 0.3s;
 }
 .plate-area.drag-over {
     background-color: #dcfce7;
     border-color: #22c55e;
+}
+.circular-plate {
+    border-radius: 50%;
+    aspect-ratio: 1;
 }
 .selected-food {
     animation: popIn 0.3s ease;
@@ -42,53 +45,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="h-screen flex flex-col p-4 overflow-hidden">
-    <!-- 顶部区域：Q版小人 + 餐盘 -->
-    <div class="flex gap-6 mb-4 flex-shrink-0" style="height: 600px;">
-        <!-- 左上角：Q版小人（无卡片背景） -->
-        <div class="flex items-end justify-center" style="width: 500px;">
-            <div class="character-avatar">
-                {% if crowd == 'child' %}
-                <img src="{% static 'images/xh.png' %}" alt="小孩" style="width: 450px; height: 450px;" class="object-contain drop-shadow-xl">
-                {% elif crowd == 'elder' %}
-                <img src="{% static 'images/lr.png' %}" alt="老人" style="width: 450px; height: 450px;" class="object-contain drop-shadow-xl">
-                {% else %}
-                <img src="{% static 'images/cr.png' %}" alt="成人" style="width: 450px; height: 450px;" class="object-contain drop-shadow-xl">
-                {% endif %}
-            </div>
-        </div>
-        
-        <!-- 右上角：餐盘区 -->
-        <div class="flex-1 bg-white rounded-2xl shadow-lg p-6 flex flex-col min-h-0">
-            <div class="flex justify-between items-center mb-4 flex-shrink-0">
-                <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
-                    <i data-lucide="chef-hat" class="w-8 h-8 text-orange-500"></i>
-                    我的餐盘
-                </h2>
-                <div class="flex items-center gap-8">
-                    <p class="text-gray-500 text-xl">已选 <span id="selected-count" class="text-orange-500 font-bold text-2xl">0</span> / {{ max_foods }} 种</p>
-                    <button id="submit-btn" class="px-10 py-4 bg-orange-500 text-white text-xl font-bold rounded-full hover:bg-orange-600 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-3" disabled>
-                        <i data-lucide="check" class="w-7 h-7"></i>
-                        完成搭配
-                    </button>
-                </div>
-            </div>
-            
-            <!-- 餐盘放置区 -->
-            <div class="plate-area flex-1 border-4 border-dashed border-gray-300 rounded-2xl p-5 overflow-y-auto min-h-0" id="plate">
-                <div class="w-full h-full flex flex-col items-center justify-center text-gray-400" id="plate-hint">
-                    <i data-lucide="hand" class="w-20 h-20 mb-4"></i>
-                    <span class="text-3xl">将食物拖到这里</span>
-                </div>
-                <div class="grid grid-cols-5 gap-4 hidden" id="plate-foods">
-                    <!-- 已选食物 -->
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 下方：食物选择区 -->
-    <div class="flex-1 bg-white rounded-2xl shadow-lg p-4 flex flex-col min-h-0">
+<div class="h-screen flex p-4 gap-4 overflow-hidden">
+    <!-- 左侧：食物选择区 -->
+    <div class="bg-white rounded-2xl shadow-lg p-4 flex flex-col" style="flex: 2; min-height: 0;">
         <div class="flex justify-between items-center mb-3 flex-shrink-0">
             <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <i data-lucide="apple" class="w-5 h-5 text-red-500"></i>
@@ -114,9 +73,51 @@
         
         <!-- 食物列表 -->
         <div class="flex-1 overflow-y-auto min-h-0">
-            <div class="grid grid-cols-8 gap-3 p-1" id="food-list">
+            <div class="grid grid-cols-6 gap-2 p-1" id="food-list">
                 <!-- 动态加载 -->
             </div>
+        </div>
+    </div>
+    
+    <!-- 右侧：餐盘 + 人物 -->
+    <div class="flex flex-col gap-4" style="flex: 1; min-height: 0;">
+        <!-- 右上：圆形餐盘区 -->
+        <div class="bg-white rounded-2xl shadow-lg p-4 flex flex-col items-center" style="flex: 2; min-height: 0;">
+            <div class="flex justify-between items-center mb-2 w-full flex-shrink-0">
+                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i data-lucide="chef-hat" class="w-5 h-5 text-orange-500"></i>
+                    我的餐盘
+                </h2>
+                <p class="text-gray-500 text-sm">已选 <span id="selected-count" class="text-orange-500 font-bold">0</span> / {{ max_foods }} 种</p>
+            </div>
+            
+            <!-- 圆形餐盘 - 占满卡片 -->
+            <div class="plate-area aspect-square w-full max-h-[calc(100%-40px)] rounded-full border-4 border-dashed border-gray-300 bg-amber-50 p-6 overflow-visible flex items-center justify-center" id="plate">
+                <div class="w-full h-full flex flex-col items-center justify-center text-gray-400" id="plate-hint">
+                    <i data-lucide="hand" class="w-12 h-12 mb-2"></i>
+                    <span class="text-lg">将食物拖到这里</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 hidden w-full" id="plate-foods">
+                    <!-- 已选食物 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右下：Q版人物 + 按钮 -->
+        <div class="flex items-center justify-center gap-4" style="flex-shrink: 0; height: 180px;">
+            <div class="character-avatar">
+                {% if crowd == 'child' %}
+                <img src="{% static 'images/xh.png' %}" alt="小孩" class="h-full max-w-full object-contain drop-shadow-xl" style="max-height: 160px;">
+                {% elif crowd == 'elder' %}
+                <img src="{% static 'images/lr.png' %}" alt="老人" class="h-full max-w-full object-contain drop-shadow-xl" style="max-height: 160px;">
+                {% else %}
+                <img src="{% static 'images/cr.png' %}" alt="成人" class="h-full max-w-full object-contain drop-shadow-xl" style="max-height: 160px;">
+                {% endif %}
+            </div>
+            <button id="submit-btn" class="px-8 py-4 bg-orange-500 text-white text-lg font-bold rounded-full hover:bg-orange-600 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg" disabled>
+                <i data-lucide="check" class="w-5 h-5"></i>
+                完成搭配
+            </button>
         </div>
     </div>
 </div>
@@ -191,14 +192,14 @@ async function loadFoods(category = '') {
         
         const isSelected = selectedFoods.some(f => f.id === food.id);
         const div = document.createElement('div');
-        div.className = `food-item p-2 bg-gray-50 rounded-xl text-center transition-all hover:bg-gray-100 hover:shadow-md ${isSelected ? 'opacity-40 pointer-events-none' : ''}`;
+        div.className = `food-item bg-gray-50 rounded-lg p-1 text-center transition-all hover:bg-gray-100 hover:shadow-md ${isSelected ? 'opacity-40 pointer-events-none' : ''}`;
         div.dataset.id = food.id;
         div.dataset.name = food.name;
         div.dataset.image = food.image || '';
         div.draggable = !isSelected;
         
         div.innerHTML = `
-            <div class="mb-1">${food.image ? `<img src="${food.image}" class="w-14 h-14 mx-auto object-cover rounded-lg">` : '<i data-lucide="utensils" class="w-10 h-10 mx-auto text-gray-400"></i>'}</div>
+            <div class="aspect-square mb-1">${food.image ? `<img src="${food.image}" class="w-full h-full object-cover rounded-md">` : '<div class="w-full h-full flex items-center justify-center"><i data-lucide="utensils" class="w-8 h-8 text-gray-400"></i></div>'}</div>
             <div class="text-xs font-medium truncate">${food.name}</div>
         `;
         
@@ -322,14 +323,20 @@ function updatePlate() {
         
         selectedFoods.forEach(food => {
             const div = document.createElement('div');
-            div.className = 'selected-food bg-green-50 rounded-xl p-4 text-center relative group';
+            div.className = 'selected-food bg-white/80 rounded-lg p-1 text-center relative group cursor-grab';
+            div.dataset.id = food.id;
+            div.dataset.name = food.name;
+            div.dataset.image = food.image || '';
+            div.draggable = true;
             div.innerHTML = `
-                <button class="absolute -top-2 -right-2 w-7 h-7 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center" onclick="removeFromPlate(${food.id})">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+                <button class="absolute -top-2 -right-2 w-10 h-10 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center" onclick="event.stopPropagation(); removeFromPlate(${food.id})">
+                    <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
-                <div class="mb-2">${food.image ? `<img src="${food.image}" class="w-20 h-20 mx-auto object-cover rounded-lg">` : '<i data-lucide="utensils" class="w-16 h-16 mx-auto text-gray-400"></i>'}</div>
-                <div class="text-base font-medium text-gray-700 truncate">${food.name}</div>
+                <div class="aspect-square mb-1">${food.image ? `<img src="${food.image}" class="w-full h-full object-cover rounded-md">` : '<div class="w-full h-full flex items-center justify-center"><i data-lucide="utensils" class="w-8 h-8 text-gray-400"></i></div>'}</div>
+                <div class="text-xs font-medium text-gray-700 truncate">${food.name}</div>
             `;
+            // 初始化拖拽，标记来源为餐盘
+            initDraggable(div, 'plate');
             plateFoods.appendChild(div);
         });
         
@@ -423,5 +430,6 @@ document.getElementById('submit-btn').addEventListener('click', async function()
 
 loadFoods();
 initPlateDropZone(document.getElementById('plate'), addToPlate);
+initFoodListDropZone(document.getElementById('food-list'), removeFromPlate);
 </script>
 {% endblock %}
