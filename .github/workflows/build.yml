@@ -11,12 +11,7 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-        python-version: ['3.10']
-    
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     
     steps:
     - name: Checkout code
@@ -25,7 +20,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: '3.10'
     
     - name: Install uv
       uses: astral-sh/setup-uv@v4
@@ -46,81 +41,36 @@ jobs:
       run: |
         uv run python manage.py collectstatic --noinput
     
-    - name: Build with PyInstaller (Windows)
-      if: runner.os == 'Windows'
+    - name: Build with PyInstaller
       shell: bash
       run: |
         uv run pyinstaller build_exe.spec
-    
-    - name: Build with PyInstaller (macOS/Linux)
-      if: runner.os != 'Windows'
-      shell: bash
-      run: |
-        uv run pyinstaller build_exe.spec
-    
-    - name: Get OS name
-      id: os-name
-      shell: bash
-      run: |
-        if [ "${{ runner.os }}" == "Windows" ]; then
-          echo "name=windows" >> $GITHUB_OUTPUT
-          echo "ext=.exe" >> $GITHUB_OUTPUT
-        elif [ "${{ runner.os }}" == "macOS" ]; then
-          echo "name=macos" >> $GITHUB_OUTPUT
-          echo "ext=" >> $GITHUB_OUTPUT
-        else
-          echo "name=linux" >> $GITHUB_OUTPUT
-          echo "ext=" >> $GITHUB_OUTPUT
-        fi
     
     - name: Rename dist folder
       shell: bash
       run: |
         cd dist
         if [ -d "膳食健康知识问答系统" ]; then
-          mv "膳食健康知识问答系统" "diet-health-${{ steps.os-name.outputs.name }}"
+          mv "膳食健康知识问答系统" "diet-health-windows"
         fi
     
-    - name: Create archive (Windows)
-      if: runner.os == 'Windows'
+    - name: Create archive
+      shell: bash
       run: |
         cd dist
-        Compress-Archive -Path "diet-health-${{ steps.os-name.outputs.name }}" -DestinationPath "diet-health-${{ steps.os-name.outputs.name }}.zip"
+        7z a -tzip "diet-health-windows.zip" "diet-health-windows"
     
-    - name: Create archive (macOS/Linux)
-      if: runner.os != 'Windows'
-      run: |
-        cd dist
-        tar -czf "diet-health-${{ steps.os-name.outputs.name }}.tar.gz" "diet-health-${{ steps.os-name.outputs.name }}"
-    
-    - name: Upload artifact (Windows)
-      if: runner.os == 'Windows'
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: diet-health-${{ steps.os-name.outputs.name }}
-        path: dist/diet-health-${{ steps.os-name.outputs.name }}.zip
+        name: diet-health-windows
+        path: dist/diet-health-windows.zip
         retention-days: 30
     
-    - name: Upload artifact (macOS/Linux)
-      if: runner.os != 'Windows'
-      uses: actions/upload-artifact@v4
-      with:
-        name: diet-health-${{ steps.os-name.outputs.name }}
-        path: dist/diet-health-${{ steps.os-name.outputs.name }}.tar.gz
-        retention-days: 30
-    
-    - name: Upload to Release (Windows)
-      if: startsWith(github.ref, 'refs/tags/v') && runner.os == 'Windows'
+    - name: Upload to Release
+      if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/diet-health-${{ steps.os-name.outputs.name }}.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Upload to Release (macOS/Linux)
-      if: startsWith(github.ref, 'refs/tags/v') && runner.os != 'Windows'
-      uses: softprops/action-gh-release@v1
-      with:
-        files: dist/diet-health-${{ steps.os-name.outputs.name }}.tar.gz
+        files: dist/diet-health-windows.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
