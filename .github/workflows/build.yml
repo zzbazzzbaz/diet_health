@@ -37,6 +37,11 @@ jobs:
         mkdir -p logs
         mkdir -p media
     
+    - name: Run database migrations
+      shell: bash
+      run: |
+        uv run python manage.py migrate --noinput
+    
     - name: Collect static files
       shell: bash
       run: |
