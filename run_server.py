@@ -15,6 +15,31 @@ def open_browser():
     time.sleep(2)
     webbrowser.open('http://127.0.0.1:8000')
 
+def init_database():
+    """初始化数据库和创建超级管理员"""
+    from django.core.management import call_command
+    from django.contrib.auth import get_user_model
+    
+    try:
+        # 运行数据库迁移
+        print("正在初始化数据库...")
+        call_command('migrate', '--noinput', verbosity=0)
+        
+        # 创建超级管理员
+        User = get_user_model()
+        if not User.objects.filter(username='admin').exists():
+            print("正在创建管理员账号...")
+            User.objects.create_superuser(
+                username='admin',
+                email='admin@example.com',
+                password='123456'
+            )
+            print("管理员账号已创建: admin / 123456")
+        else:
+            print("管理员账号已存在")
+    except Exception as e:
+        print(f"数据库初始化错误: {e}")
+
 def main():
     """启动 Django 开发服务器"""
     # 设置环境变量
@@ -44,6 +69,9 @@ def main():
     # 确保必要的目录存在
     (base_dir / 'logs').mkdir(exist_ok=True)
     (base_dir / 'media').mkdir(exist_ok=True)
+    
+    # 初始化数据库
+    init_database()
     
     try:
         from django.core.management import execute_from_command_line
