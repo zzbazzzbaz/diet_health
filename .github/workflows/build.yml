@@ -35,6 +35,10 @@ jobs:
         uv sync
         uv pip install pyinstaller
     
+    - name: Create logs directory
+      run: |
+        mkdir -p logs
+    
     - name: Collect static files
       run: |
         uv run python manage.py collectstatic --noinput
