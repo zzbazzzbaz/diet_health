@@ -35,6 +35,7 @@ jobs:
       shell: bash
       run: |
         mkdir -p logs
+        mkdir -p media
     
     - name: Collect static files
       shell: bash
