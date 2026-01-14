@@ -31,25 +31,30 @@ jobs:
       uses: astral-sh/setup-uv@v4
     
     - name: Install dependencies
+      shell: bash
       run: |
         uv sync
         uv pip install pyinstaller
     
     - name: Create logs directory
+      shell: bash
       run: |
         mkdir -p logs
     
     - name: Collect static files
+      shell: bash
       run: |
         uv run python manage.py collectstatic --noinput
     
     - name: Build with PyInstaller (Windows)
       if: runner.os == 'Windows'
+      shell: bash
       run: |
         uv run pyinstaller build_exe.spec
     
     - name: Build with PyInstaller (macOS/Linux)
       if: runner.os != 'Windows'
+      shell: bash
       run: |
         uv run pyinstaller build_exe.spec
     
